@@ -6,6 +6,11 @@ import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
 import Features from "@/components/landing/Features";
 import HowItWorks from "@/components/landing/HowItWorks";
+import DashboardPreview from "@/components/landing/DashboardPreview";
+import Integrations from "@/components/landing/Integrations";
+import Testimonials from "@/components/landing/Testimonials";
+import Pricing from "@/components/landing/Pricing";
+import Footer from "@/components/landing/Footer";
 
 export default function Home() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -26,30 +31,13 @@ export default function Home() {
     <main className="min-h-screen bg-[#0B0B0F] text-white">
       <Navbar loggedIn={loggedIn} />
       <Hero loggedIn={loggedIn} />
-
       <Features />
-
       <HowItWorks />
-
-      {/* Pricing Placeholder */}
-      <section
-        id="pricing"
-        className="border-t border-gray-800 py-24 text-center"
-      >
-        <h2 className="text-4xl font-bold">Pricing</h2>
-
-        <p className="mt-4 text-gray-400">
-          Coming Soon...
-        </p>
-      </section>
-
-      {/* Footer */}
-      <footer
-        id="footer"
-        className="border-t border-gray-800 py-10 text-center text-gray-500"
-      >
-        © 2026 UnlockScripts. All rights reserved.
-      </footer>
+      <DashboardPreview />
+      <Integrations />
+      <Testimonials />
+      <Pricing />
+      <Footer />
     </main>
   );
 }
