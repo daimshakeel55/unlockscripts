@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
       ipAddress,
     } = body;
 
-    // 1. Insert the analytics event
+    // Insert analytics event
     const { error } = await supabaseAdmin
       .from("analytics_events")
       .insert({
@@ -30,20 +30,30 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       console.error(error);
+
       return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 500 }
+        {
+          success: false,
+          error: error.message,
+        },
+        {
+          status: 500,
+        }
       );
     }
 
-    // 2. Increment the views count in the lockers table
-    const { error: rpcError } = await supabaseAdmin.rpc("increment_views", {
-      locker_id_input: lockerId,
-    });
+    // Only increment views for VIEW events
+    if (eventType === "view") {
+      const { error: rpcError } = await supabaseAdmin.rpc(
+        "increment_views",
+        {
+          locker_id_input: lockerId,
+        }
+      );
 
-    if (rpcError) {
-      console.error("Failed to increment views:", rpcError);
-      // We do not fail the request if the view increment fails
+      if (rpcError) {
+        console.error("Failed to increment views:", rpcError);
+      }
     }
 
     return NextResponse.json({
@@ -53,8 +63,12 @@ export async function POST(req: NextRequest) {
     console.error(err);
 
     return NextResponse.json(
-      { success: false },
-      { status: 500 }
+      {
+        success: false,
+      },
+      {
+        status: 500,
+      }
     );
   }
 }
