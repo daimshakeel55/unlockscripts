@@ -319,13 +319,13 @@ export default function DashboardPage() {
   }, [lockers]);
 
   return (
-    <main className="relative flex min-h-screen bg-[#0B0B0F] text-white">
+    <main className="relative flex min-h-screen flex-col bg-[#0B0B0F] pb-20 text-white lg:flex-row lg:pb-0">
       <Sidebar />
 
       <section className="relative flex-1 overflow-y-auto">
         <DashboardBackground reducedMotion={reducedMotion} />
 
-        <div className="relative z-10 p-6 md:p-10 lg:p-12">
+        <div className="relative z-10 p-4 sm:p-6 md:p-10 lg:p-12">
           <motion.header
             initial={reducedMotion ? false : { opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}

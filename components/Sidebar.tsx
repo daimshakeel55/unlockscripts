@@ -10,109 +10,87 @@ import {
   FaLock,
 } from "react-icons/fa";
 
+const menu = [
+  { name: "Dashboard", href: "/dashboard", icon: FaHome, short: "Home" },
+  { name: "Create Locker", href: "/create", icon: FaPlusCircle, short: "Create" },
+  { name: "Analytics", href: "/analytics", icon: FaChartBar, short: "Stats" },
+  { name: "Settings", href: "/settings", icon: FaCog, short: "Settings" },
+];
+
 export default function Sidebar() {
   const pathname = usePathname();
 
-  const menu = [
-    {
-      name: "Dashboard",
-      href: "/dashboard",
-      icon: FaHome,
-    },
-    {
-      name: "Create Locker",
-      href: "/create",
-      icon: FaPlusCircle,
-    },
-    {
-      name: "Analytics",
-      href: "/analytics",
-      icon: FaChartBar,
-    },
-    {
-      name: "Settings",
-      href: "/settings",
-      icon: FaCog,
-    },
-  ];
-
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-gray-800 bg-[#111118]">
-
-      {/* Logo */}
-
-      <div className="border-b border-gray-800 p-8">
-
-        <div className="flex items-center gap-3">
-
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-600">
-
-            <FaLock className="text-white text-lg" />
-
+    <>
+      {/* Desktop sidebar */}
+      <aside className="hidden h-screen w-64 shrink-0 flex-col border-r border-gray-800 bg-[#111118] lg:flex">
+        <div className="border-b border-gray-800 p-6 xl:p-8">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-600">
+              <FaLock className="text-lg text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-white">UnlockScripts</h1>
+              <p className="text-xs text-gray-400">Locker Dashboard</p>
+            </div>
           </div>
-
-          <div>
-
-            <h1 className="text-xl font-bold text-white">
-              UnlockScripts
-            </h1>
-
-            <p className="text-xs text-gray-400">
-              Locker Dashboard
-            </p>
-
-          </div>
-
         </div>
 
-      </div>
+        <nav className="flex-1 space-y-2 p-4 xl:p-6">
+          {menu.map((item) => {
+            const Icon = item.icon;
+            const active = pathname === item.href;
 
-      {/* Navigation */}
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all ${
+                  active
+                    ? "bg-violet-600 text-white"
+                    : "text-gray-400 hover:bg-[#1b1b24] hover:text-white"
+                }`}
+              >
+                <Icon className="text-lg" />
+                <span className="font-medium">{item.name}</span>
+              </Link>
+            );
+          })}
+        </nav>
 
-      <nav className="flex-1 space-y-2 p-6">
+        <div className="border-t border-gray-800 p-4 xl:p-6">
+          <div className="rounded-xl bg-[#18181F] p-4">
+            <p className="text-sm font-semibold">UnlockScripts</p>
+            <p className="mt-1 text-xs text-gray-400">Version 1.0</p>
+          </div>
+        </div>
+      </aside>
 
-        {menu.map((item) => {
-          const Icon = item.icon;
+      {/* Mobile bottom navigation */}
+      <nav
+        aria-label="Mobile navigation"
+        className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.08] bg-[#111118]/95 backdrop-blur-xl lg:hidden"
+      >
+        <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-2">
+          {menu.map((item) => {
+            const Icon = item.icon;
+            const active = pathname === item.href;
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all ${
-                pathname === item.href
-                  ? "bg-violet-600 text-white"
-                  : "text-gray-400 hover:bg-[#1b1b24] hover:text-white"
-              }`}
-            >
-              <Icon className="text-lg" />
-
-              <span className="font-medium">
-                {item.name}
-              </span>
-            </Link>
-          );
-        })}
-
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex min-w-0 flex-1 flex-col items-center gap-1 rounded-xl px-2 py-2 text-[10px] font-medium transition-colors sm:text-xs ${
+                  active ? "text-violet-400" : "text-gray-500 hover:text-white"
+                }`}
+              >
+                <Icon className={`text-lg ${active ? "text-violet-400" : ""}`} />
+                <span className="truncate">{item.short}</span>
+              </Link>
+            );
+          })}
+        </div>
       </nav>
-
-      {/* Footer */}
-
-      <div className="border-t border-gray-800 p-6">
-
-        <div className="rounded-xl bg-[#18181F] p-4">
-
-          <p className="text-sm font-semibold">
-            UnlockScripts
-          </p>
-
-          <p className="mt-1 text-xs text-gray-400">
-            Version 1.0
-          </p>
-
-        </div>
-
-      </div>
-
-    </aside>
+    </>
   );
 }

@@ -317,14 +317,14 @@ export default function Hero({ loggedIn }: HeroProps) {
   return (
     <section
       aria-labelledby="hero-heading"
-      className="relative overflow-hidden px-6 pb-24 pt-12 sm:pt-16 lg:pb-32 lg:pt-20"
+      className="relative overflow-hidden px-4 pb-20 pt-10 sm:px-6 sm:pb-24 sm:pt-12 lg:pb-32 lg:pt-20"
     >
       <AuroraBackground reducedMotion={reducedMotion} />
       <ParticleField reducedMotion={reducedMotion} />
       <FloatingSocialIcons reducedMotion={reducedMotion} />
 
-      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-2 lg:gap-12">
-        <motion.div initial="hidden" animate="visible">
+      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2 lg:gap-12">
+        <motion.div initial="hidden" animate="visible" className="text-center lg:text-left">
           <motion.div custom={0} variants={fadeUp} className="mb-6 inline-flex">
             <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-xs font-medium tracking-wide text-violet-300 backdrop-blur-sm">
               The premium content locker platform
@@ -352,7 +352,7 @@ export default function Hero({ loggedIn }: HeroProps) {
           <motion.p
             custom={2}
             variants={fadeUp}
-            className="mt-6 max-w-lg text-base leading-relaxed text-gray-400 sm:text-lg"
+            className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-gray-400 sm:text-lg lg:mx-0"
           >
             Share files securely, protect premium content, and track every unlock
             from one beautiful dashboard.
@@ -361,7 +361,7 @@ export default function Hero({ loggedIn }: HeroProps) {
           <motion.div
             custom={3}
             variants={fadeUp}
-            className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4"
+            className="mx-auto mt-10 flex max-w-lg flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-center sm:gap-4 lg:mx-0 lg:justify-start"
           >
             <PremiumButton href={loggedIn ? "/dashboard" : "/register"}>
               {loggedIn ? "Dashboard" : "Get Started"}
@@ -380,7 +380,7 @@ export default function Hero({ loggedIn }: HeroProps) {
           <motion.div
             custom={4}
             variants={fadeUp}
-            className="mt-12 flex flex-wrap items-center gap-5 text-xs text-gray-500 sm:gap-8"
+            className="mt-10 grid grid-cols-3 gap-x-3 gap-y-4 text-xs text-gray-500 sm:flex sm:flex-wrap sm:items-center sm:gap-8"
           >
             <span className="flex items-center gap-2">
               <FaYoutube className="text-red-400/70" aria-hidden="true" />

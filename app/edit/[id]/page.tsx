@@ -37,8 +37,8 @@ export default async function EditLockerPage({
     .eq("locker_id", id);
 
   return (
-    <main className="min-h-screen bg-[#0B0B0F] text-white p-10">
-      <h1 className="mb-8 text-4xl font-bold">
+      <main className="min-h-screen bg-[#0B0B0F] p-4 text-white sm:p-6 md:p-10">
+      <h1 className="mb-6 text-2xl font-bold sm:mb-8 sm:text-4xl">
         Edit Locker
       </h1>
 

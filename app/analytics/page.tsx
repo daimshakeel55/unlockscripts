@@ -72,12 +72,12 @@ export default function AnalyticsPage() {
   const topCountries = Object.entries(countryMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
   return (
-    <main className="min-h-screen bg-[#0B0B0F] text-white flex">
+    <main className="flex min-h-screen flex-col bg-[#0B0B0F] pb-20 text-white lg:flex-row lg:pb-0">
       <Sidebar />
-      <section className="flex-1 p-10 overflow-y-auto">
-        <h1 className="text-4xl font-bold tracking-tight mb-8">Analytics</h1>
+      <section className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-10">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">Analytics</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
           {[
             { title: "Total Views", value: totalViews },
             { title: "Total Lockers", value: totalLockers },
