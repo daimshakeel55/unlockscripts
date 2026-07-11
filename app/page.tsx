@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import Navbar from "@/components/landing/Navbar";
+import Hero from "@/components/landing/Hero";
 
 export default function Home() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -21,94 +22,8 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#0B0B0F] text-white">
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-gray-800 bg-[#0B0B0F]/90 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-5">
-          <h1 className="text-2xl font-bold">
-            Unlock<span className="text-violet-500">Scripts</span>
-          </h1>
-
-          <div className="hidden gap-8 text-gray-300 md:flex">
-            <a href="#" className="hover:text-violet-500">
-              Home
-            </a>
-            <a href="#features" className="hover:text-violet-500">
-              Features
-            </a>
-            <a href="#pricing" className="hover:text-violet-500">
-              Pricing
-            </a>
-            <a href="#footer" className="hover:text-violet-500">
-              Docs
-            </a>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {loggedIn ? (
-              <Link
-                href="/dashboard"
-                className="rounded-lg bg-violet-600 px-5 py-2 font-medium transition hover:bg-violet-500"
-              >
-                Dashboard
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="rounded-lg border border-gray-700 px-5 py-2 font-medium transition hover:bg-white hover:text-black"
-                >
-                  Login
-                </Link>
-
-                <Link
-                  href="/register"
-                  className="rounded-lg bg-violet-600 px-5 py-2 font-medium transition hover:bg-violet-500"
-                >
-                  Sign Up
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero */}
-      <section className="flex min-h-[90vh] flex-col items-center justify-center px-6 text-center">
-        <h1 className="max-w-5xl text-6xl font-extrabold leading-tight md:text-7xl">
-          Create Powerful
-          <span className="text-violet-500"> Content Lockers</span>
-        </h1>
-
-        <p className="mt-6 max-w-2xl text-lg text-gray-400">
-          Share files securely, protect premium content, and track every unlock
-          from one beautiful dashboard.
-        </p>
-
-        <div className="mt-10 flex gap-4">
-          {loggedIn ? (
-            <Link
-              href="/dashboard"
-              className="rounded-xl bg-violet-600 px-8 py-4 font-semibold transition hover:bg-violet-500"
-            >
-              Dashboard
-            </Link>
-          ) : (
-            <Link
-              href="/register"
-              className="rounded-xl bg-violet-600 px-8 py-4 font-semibold transition hover:bg-violet-500"
-            >
-              Get Started
-            </Link>
-          )}
-
-          <a
-            href="#features"
-            className="rounded-xl border border-gray-700 px-8 py-4 transition hover:bg-white hover:text-black"
-          >
-            Learn More
-          </a>
-        </div>
-      </section>
+      <Navbar loggedIn={loggedIn} />
+      <Hero loggedIn={loggedIn} />
 
       {/* Features */}
       <section id="features" className="bg-[#111118] py-24">
