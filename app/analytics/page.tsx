@@ -12,8 +12,7 @@ import {
   FaMobileAlt,
   FaTrophy,
 } from "react-icons/fa";
-import Sidebar from "@/components/Sidebar";
-import PageBackground from "@/components/ui/PageBackground";
+import AppPageLayout from "@/components/layout/AppPageLayout";
 import { supabase } from "@/lib/supabase";
 import { getCountryFlag } from "@/lib/country-utils";
 
@@ -560,31 +559,18 @@ export default function AnalyticsPage() {
   }, [events]);
 
   return (
-    <main className="relative flex min-h-screen flex-col bg-[#0B0B0F] pb-20 text-white lg:flex-row lg:pb-0">
-      <Sidebar />
-
-      <section className="relative flex-1 overflow-y-auto">
-        <PageBackground />
-
-        <div className="relative z-10 p-4 sm:p-6 md:p-10 lg:p-12">
-          <motion.header
-            initial={reducedMotion ? false : { opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-10"
-          >
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Analytics{" "}
-              <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                Dashboard
-              </span>
-            </h1>
-            <p className="mt-2 max-w-xl text-gray-400">
-              Track views, unlocks, traffic sources, and audience insights across your lockers.
-            </p>
-          </motion.header>
-
-          {loading ? (
+    <AppPageLayout
+      title={
+        <>
+          Analytics{" "}
+          <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+            Dashboard
+          </span>
+        </>
+      }
+      subtitle="Track views, unlocks, traffic sources, and audience insights across your lockers."
+    >
+      {loading ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div
@@ -686,8 +672,6 @@ export default function AnalyticsPage() {
               </div>
             </>
           )}
-        </div>
-      </section>
-    </main>
+    </AppPageLayout>
   );
 }

@@ -17,7 +17,7 @@ import { supabase } from "@/lib/supabase";
 import { getAbsoluteUrl } from "@/lib/site-url";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
-import Sidebar from "@/components/Sidebar";
+import AppPageLayout from "@/components/layout/AppPageLayout";
 
 type Locker = {
   id: string;
@@ -28,24 +28,6 @@ type Locker = {
   created_at: string;
   views?: number;
 };
-
-function DashboardBackground({ reducedMotion }: { reducedMotion: boolean }) {
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_80%_0%,rgba(139,92,246,0.12),transparent_60%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_10%_80%,rgba(217,70,239,0.08),transparent_50%)]" />
-      <motion.div
-        className="absolute -right-32 top-20 h-96 w-96 rounded-full bg-violet-600/10 blur-[100px]"
-        animate={reducedMotion ? undefined : { x: [0, 20, 0], y: [0, -15, 0] }}
-        transition={
-          reducedMotion
-            ? undefined
-            : { duration: 14, repeat: Infinity, ease: "easeInOut" }
-        }
-      />
-    </div>
-  );
-}
 
 function StatCard({
   label,
@@ -319,36 +301,23 @@ export default function DashboardPage() {
   }, [lockers]);
 
   return (
-    <main className="relative flex min-h-screen flex-col bg-[#0B0B0F] pb-20 text-white lg:flex-row lg:pb-0">
-      <Sidebar />
-
-      <section className="relative flex-1 overflow-y-auto">
-        <DashboardBackground reducedMotion={reducedMotion} />
-
-        <div className="relative z-10 p-4 sm:p-6 md:p-10 lg:p-12">
-          <motion.header
-            initial={reducedMotion ? false : { opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-10 flex flex-col gap-6 md:flex-row md:items-start md:justify-between"
-          >
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                My{" "}
-                <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                  Lockers
-                </span>
-              </h1>
-              <p className="mt-2 max-w-xl text-gray-400">
-                Manage your active content lockers and track performance.
-              </p>
-            </div>
-            <Button href="/create" variant="primary" size="md">
-              + New Locker
-            </Button>
-          </motion.header>
-
-          {loading ? (
+    <AppPageLayout
+      title={
+        <>
+          My{" "}
+          <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+            Lockers
+          </span>
+        </>
+      }
+      subtitle="Manage your active content lockers and track performance."
+      headerAction={
+        <Button href="/create" variant="primary" size="md">
+          + New Locker
+        </Button>
+      }
+    >
+      {loading ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div
@@ -414,8 +383,6 @@ export default function DashboardPage() {
               </div>
             </>
           )}
-        </div>
-      </section>
-    </main>
+    </AppPageLayout>
   );
 }

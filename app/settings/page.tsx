@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import Sidebar from "@/components/Sidebar";
-import PageBackground from "@/components/ui/PageBackground";
+import AppPageLayout from "@/components/layout/AppPageLayout";
 import { supabase } from "@/lib/supabase";
 import {
   FaUser,
@@ -149,166 +148,151 @@ export default function SettingsPage() {
   }
 
   return (
-    <main className="relative flex min-h-screen flex-col bg-[#0B0B0F] pb-20 text-white lg:flex-row lg:pb-0">
-      <Sidebar />
+    <AppPageLayout
+      title={
+        <>
+          Account{" "}
+          <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+            Settings
+          </span>
+        </>
+      }
+      subtitle="Update your profile, security, and account preferences."
+    >
+      {message && (
+        <motion.div
+          initial={reducedMotion ? false : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-400 backdrop-blur-sm"
+        >
+          {message}
+        </motion.div>
+      )}
 
-      <section className="relative flex-1 overflow-y-auto">
-        <PageBackground />
+      {error && (
+        <motion.div
+          initial={reducedMotion ? false : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400 backdrop-blur-sm"
+        >
+          {error}
+        </motion.div>
+      )}
 
-        <div className="relative z-10 p-4 sm:p-6 md:p-10 lg:p-12">
-          <motion.header
-            initial={reducedMotion ? false : { opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-8 sm:mb-10"
-          >
-            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">
-              Account{" "}
-              <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                Settings
-              </span>
-            </h1>
-            <p className="mt-2 max-w-xl text-gray-400">
-              Update your profile, security, and account preferences.
-            </p>
-          </motion.header>
+      <div className="w-full max-w-3xl space-y-6">
+        <SettingsCard
+          title="Profile"
+          description="Manage your public display information"
+          icon={FaUser}
+          iconGradient="from-violet-500 to-purple-600"
+          delay={0.05}
+          reducedMotion={reducedMotion}
+        >
+          <div className="space-y-5">
+            <div>
+              <label className={labelClassName}>Display Name</label>
+              <input
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="Enter your display name"
+                className={inputClassName}
+              />
+              <p className="mt-2 text-xs text-gray-500">
+                This name will appear across your dashboard.
+              </p>
+            </div>
 
-          {message && (
-            <motion.div
-              initial={reducedMotion ? false : { opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-6 rounded-xl border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-400 backdrop-blur-sm"
+            <div>
+              <label className={labelClassName}>Email Address</label>
+              <input
+                value={email}
+                disabled
+                className={`${inputClassName} cursor-not-allowed opacity-60`}
+              />
+              <p className="mt-2 text-xs text-gray-500">
+                Your email cannot be changed here.
+              </p>
+            </div>
+
+            <motion.button
+              type="button"
+              onClick={saveProfile}
+              disabled={loadingProfile}
+              whileHover={reducedMotion ? undefined : { scale: 1.01 }}
+              whileTap={reducedMotion ? undefined : { scale: 0.99 }}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-900/30 transition-all hover:brightness-110 disabled:opacity-50"
             >
-              {message}
-            </motion.div>
-          )}
-
-          {error && (
-            <motion.div
-              initial={reducedMotion ? false : { opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400 backdrop-blur-sm"
-            >
-              {error}
-            </motion.div>
-          )}
-
-          <div className="mx-auto max-w-3xl space-y-6">
-            <SettingsCard
-              title="Profile"
-              description="Manage your public display information"
-              icon={FaUser}
-              iconGradient="from-violet-500 to-purple-600"
-              delay={0.05}
-              reducedMotion={reducedMotion}
-            >
-              <div className="space-y-5">
-                <div>
-                  <label className={labelClassName}>Display Name</label>
-                  <input
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    placeholder="Enter your display name"
-                    className={inputClassName}
-                  />
-                  <p className="mt-2 text-xs text-gray-500">
-                    This name will appear across your dashboard.
-                  </p>
-                </div>
-
-                <div>
-                  <label className={labelClassName}>Email Address</label>
-                  <input
-                    value={email}
-                    disabled
-                    className={`${inputClassName} cursor-not-allowed opacity-60`}
-                  />
-                  <p className="mt-2 text-xs text-gray-500">
-                    Your email cannot be changed here.
-                  </p>
-                </div>
-
-                <motion.button
-                  type="button"
-                  onClick={saveProfile}
-                  disabled={loadingProfile}
-                  whileHover={reducedMotion ? undefined : { scale: 1.01 }}
-                  whileTap={reducedMotion ? undefined : { scale: 0.99 }}
-                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-900/30 transition-all hover:brightness-110 disabled:opacity-50"
-                >
-                  <FaSave aria-hidden="true" />
-                  {loadingProfile ? "Saving..." : "Save Changes"}
-                </motion.button>
-              </div>
-            </SettingsCard>
-
-            <SettingsCard
-              title="Security"
-              description="Keep your account safe with a strong password"
-              icon={FaShieldAlt}
-              iconGradient="from-indigo-500 to-violet-600"
-              delay={0.1}
-              reducedMotion={reducedMotion}
-            >
-              <div className="space-y-5">
-                <div>
-                  <label className={labelClassName}>New Password</label>
-                  <input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Enter a new password"
-                    className={inputClassName}
-                  />
-                </div>
-
-                <div>
-                  <label className={labelClassName}>Confirm Password</label>
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm your new password"
-                    className={inputClassName}
-                  />
-                </div>
-
-                <motion.button
-                  type="button"
-                  onClick={updatePassword}
-                  disabled={loadingPassword}
-                  whileHover={reducedMotion ? undefined : { scale: 1.01 }}
-                  whileTap={reducedMotion ? undefined : { scale: 0.99 }}
-                  className="inline-flex items-center gap-2 rounded-xl border border-violet-500/30 bg-violet-500/10 px-6 py-3 text-sm font-semibold text-violet-200 transition-all hover:border-violet-500/50 hover:bg-violet-500/20 disabled:opacity-50"
-                >
-                  <FaLock aria-hidden="true" />
-                  {loadingPassword ? "Updating..." : "Update Password"}
-                </motion.button>
-              </div>
-            </SettingsCard>
-
-            <SettingsCard
-              title="Account"
-              description="Sign out of UnlockScripts on this device"
-              icon={FaSignOutAlt}
-              iconGradient="from-red-500 to-rose-600"
-              delay={0.15}
-              reducedMotion={reducedMotion}
-              variant="danger"
-            >
-              <motion.button
-                type="button"
-                onClick={logout}
-                whileHover={reducedMotion ? undefined : { scale: 1.01 }}
-                whileTap={reducedMotion ? undefined : { scale: 0.99 }}
-                className="rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-red-900/20 transition-all hover:bg-red-500"
-              >
-                Logout
-              </motion.button>
-            </SettingsCard>
+              <FaSave aria-hidden="true" />
+              {loadingProfile ? "Saving..." : "Save Changes"}
+            </motion.button>
           </div>
-        </div>
-      </section>
-    </main>
+        </SettingsCard>
+
+        <SettingsCard
+          title="Security"
+          description="Keep your account safe with a strong password"
+          icon={FaShieldAlt}
+          iconGradient="from-indigo-500 to-violet-600"
+          delay={0.1}
+          reducedMotion={reducedMotion}
+        >
+          <div className="space-y-5">
+            <div>
+              <label className={labelClassName}>New Password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter a new password"
+                className={inputClassName}
+              />
+            </div>
+
+            <div>
+              <label className={labelClassName}>Confirm Password</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your new password"
+                className={inputClassName}
+              />
+            </div>
+
+            <motion.button
+              type="button"
+              onClick={updatePassword}
+              disabled={loadingPassword}
+              whileHover={reducedMotion ? undefined : { scale: 1.01 }}
+              whileTap={reducedMotion ? undefined : { scale: 0.99 }}
+              className="inline-flex items-center gap-2 rounded-xl border border-violet-500/30 bg-violet-500/10 px-6 py-3 text-sm font-semibold text-violet-200 transition-all hover:border-violet-500/50 hover:bg-violet-500/20 disabled:opacity-50"
+            >
+              <FaLock aria-hidden="true" />
+              {loadingPassword ? "Updating..." : "Update Password"}
+            </motion.button>
+          </div>
+        </SettingsCard>
+
+        <SettingsCard
+          title="Account"
+          description="Sign out of UnlockScripts on this device"
+          icon={FaSignOutAlt}
+          iconGradient="from-red-500 to-rose-600"
+          delay={0.15}
+          reducedMotion={reducedMotion}
+          variant="danger"
+        >
+          <motion.button
+            type="button"
+            onClick={logout}
+            whileHover={reducedMotion ? undefined : { scale: 1.01 }}
+            whileTap={reducedMotion ? undefined : { scale: 0.99 }}
+            className="rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-red-900/20 transition-all hover:bg-red-500"
+          >
+            Logout
+          </motion.button>
+        </SettingsCard>
+      </div>
+    </AppPageLayout>
   );
 }
