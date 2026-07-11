@@ -260,7 +260,6 @@ export default function DashboardPage() {
 
   function copyLink(slug: string) {
     navigator.clipboard.writeText(getAbsoluteUrl(`/l/${slug}`));
-    alert("✅ Link copied!");
   }
 
   const stats = useMemo(() => {
