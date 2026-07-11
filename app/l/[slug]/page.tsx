@@ -2,6 +2,9 @@ import { supabase } from "@/lib/supabase";
 import LockerTasks from "@/components/LockerTasks";
 import LockerPageShell from "@/components/locker/LockerPageShell";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type Props = {
   params: Promise<{
     slug: string;
