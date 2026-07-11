@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
 import Features from "@/components/landing/Features";
+import HowItWorks from "@/components/landing/HowItWorks";
 
 export default function Home() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -28,48 +29,7 @@ export default function Home() {
 
       <Features />
 
-      {/* How It Works */}
-      <section className="py-24">
-        <div className="mx-auto max-w-6xl px-8">
-          <h2 className="text-center text-4xl font-bold">
-            How It Works
-          </h2>
-
-          <div className="mt-16 grid gap-8 md:grid-cols-4">
-            <div className="rounded-xl border border-gray-800 p-6 transition hover:border-violet-500">
-              <h3 className="text-xl font-bold text-violet-500">1</h3>
-
-              <p className="mt-3 font-semibold">
-                Create Locker
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-gray-800 p-6 transition hover:border-violet-500">
-              <h3 className="text-xl font-bold text-violet-500">2</h3>
-
-              <p className="mt-3 font-semibold">
-                Upload File
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-gray-800 p-6 transition hover:border-violet-500">
-              <h3 className="text-xl font-bold text-violet-500">3</h3>
-
-              <p className="mt-3 font-semibold">
-                Share Link
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-gray-800 p-6 transition hover:border-violet-500">
-              <h3 className="text-xl font-bold text-violet-500">4</h3>
-
-              <p className="mt-3 font-semibold">
-                Track Unlocks
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HowItWorks />
 
       {/* Pricing Placeholder */}
       <section
