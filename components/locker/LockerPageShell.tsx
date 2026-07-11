@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { FaYoutube, FaDiscord, FaTelegram, FaGlobe, FaLock } from "react-icons/fa";
+import { FaYoutube, FaDiscord, FaTelegram, FaGlobe } from "react-icons/fa";
 
 const floatingSocialIcons = [
   { Icon: FaYoutube, glow: "from-red-600/50 to-red-400/20", color: "text-red-500", x: "5%", y: "10%", size: 36 },
@@ -140,44 +140,24 @@ export default function LockerPageShell({
           className="w-full max-w-lg"
         >
           <div className="group relative">
-            <div className="absolute -inset-1 rounded-[28px] bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-600 opacity-50 blur-lg transition-opacity group-hover:opacity-70" />
-            <div className="absolute -inset-px rounded-[26px] bg-gradient-to-br from-violet-500/50 via-fuchsia-500/30 to-transparent" />
+            <div className="absolute -inset-px rounded-3xl bg-gradient-to-b from-white/[0.08] to-transparent" />
 
-            <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0B0B0F]/80 shadow-2xl shadow-violet-950/50 backdrop-blur-2xl">
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/50 to-transparent" />
-
-              <div className="border-b border-white/[0.06] px-6 py-8 text-center sm:px-8 sm:py-10">
-                <motion.div
-                  initial={reducedMotion ? false : { scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
-                  className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-xl shadow-violet-900/50"
-                >
-                  <FaLock className="text-2xl text-white" aria-hidden="true" />
-                </motion.div>
-
-                <h1 className="bg-gradient-to-r from-white via-violet-100 to-fuchsia-200 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl">
+            <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0B0B0F]/75 shadow-xl shadow-black/40 backdrop-blur-xl">
+              <div className="px-6 pt-7 pb-1 sm:px-8 sm:pt-8">
+                <h1 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">
                   {title}
                 </h1>
-
                 {showDescription && (
-                  <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-gray-400 sm:text-base">
-                    {description}
-                  </p>
+                  <p className="mt-1.5 text-sm text-gray-500">{description}</p>
                 )}
-
-                <div className="mx-auto mt-5 h-px w-16 bg-gradient-to-r from-transparent via-violet-500/50 to-transparent" />
               </div>
 
-              <div className="px-6 py-6 sm:px-8 sm:py-8">{children}</div>
+              <div className="px-6 pb-7 pt-4 sm:px-8 sm:pb-8">{children}</div>
             </div>
           </div>
 
-          <p className="mt-8 text-center text-xs text-gray-500">
-            Secured by{" "}
-            <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text font-semibold text-transparent">
-              UnlockScripts
-            </span>
+          <p className="mt-6 text-center text-[11px] text-gray-600">
+            UnlockScripts
           </p>
         </motion.div>
       </div>

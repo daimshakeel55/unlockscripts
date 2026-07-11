@@ -10,7 +10,6 @@ import {
   FaCheck,
   FaClock,
   FaLockOpen,
-  FaShieldAlt,
 } from "react-icons/fa";
 
 type Task = {
@@ -149,16 +148,9 @@ export default function LockerTasks({
 
   return (
     <div className="w-full">
-      <div className="mb-6 text-center">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-3 py-1 text-xs font-medium text-violet-300">
-          <FaShieldAlt aria-hidden="true" />
-          {tasks.length} {tasks.length === 1 ? "task" : "tasks"} required
-        </div>
-        <h2 className="text-lg font-bold text-white sm:text-xl">Complete the tasks below</h2>
-        <p className="mt-1.5 text-sm text-gray-500">
-          Finish every task to unlock your content
-        </p>
-      </div>
+      <p className="mb-5 text-sm text-gray-500">
+        Complete {tasks.length} {tasks.length === 1 ? "task" : "tasks"} to unlock
+      </p>
 
       <div className="space-y-3">
         {tasks.map((task, index) => {
