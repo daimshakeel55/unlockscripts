@@ -34,6 +34,7 @@ export default async function EditLockerPage({ params }: Props) {
       title={locker.title}
       description={locker.description}
       destinationUrl={locker.destination_url}
+      backgroundTheme={locker.background_theme}
       tasks={tasks || []}
     />
   );

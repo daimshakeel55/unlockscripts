@@ -40,7 +40,11 @@ export default async function LockerPage({ params }: Props) {
     .eq("locker_id", locker.id);
 
   return (
-    <LockerPageShell title={locker.title} description={locker.description}>
+    <LockerPageShell
+      title={locker.title}
+      description={locker.description}
+      backgroundTheme={locker.background_theme}
+    >
       <LockerTasks
         tasks={tasks || []}
         destinationUrl={locker.destination_url}

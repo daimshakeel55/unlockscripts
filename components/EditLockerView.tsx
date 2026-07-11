@@ -14,6 +14,7 @@ type Props = {
   title: string;
   description: string;
   destinationUrl: string;
+  backgroundTheme?: string | null;
   tasks: Task[];
 };
 
@@ -22,6 +23,7 @@ export default function EditLockerView({
   title,
   description,
   destinationUrl,
+  backgroundTheme,
   tasks,
 }: Props) {
   return (
@@ -41,6 +43,7 @@ export default function EditLockerView({
         title={title}
         description={description}
         destinationUrl={destinationUrl}
+        backgroundTheme={backgroundTheme}
         tasks={tasks}
       />
     </AppPageLayout>

@@ -5,6 +5,11 @@ import { motion, useReducedMotion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import TaskSelector from "./TaskSelector";
 import LockerPreview from "./LockerPreview";
+import BackgroundThemePicker from "./locker/BackgroundThemePicker";
+import {
+  DEFAULT_LOCKER_BACKGROUND,
+  type LockerBackgroundTheme,
+} from "@/lib/locker-backgrounds";
 
 const inputClassName =
   "w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3.5 text-white backdrop-blur-sm outline-none transition-colors placeholder:text-gray-500 focus:border-violet-500/50 focus:bg-white/[0.05]";
@@ -27,6 +32,9 @@ export default function CreateLockerForm() {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [destinationUrl, setDestinationUrl] = useState<string>("");
+  const [backgroundTheme, setBackgroundTheme] = useState<LockerBackgroundTheme>(
+    DEFAULT_LOCKER_BACKGROUND
+  );
 
   const [ytSubscribe, setYtSubscribe] = useState<boolean>(false);
   const [ytLike, setYtLike] = useState<boolean>(false);
@@ -98,6 +106,7 @@ export default function CreateLockerForm() {
           title,
           description,
           destination_url: destinationUrl,
+          background_theme: backgroundTheme,
         })
         .select()
         .single();
@@ -121,6 +130,7 @@ export default function CreateLockerForm() {
       setTitle("");
       setDescription("");
       setDestinationUrl("");
+      setBackgroundTheme(DEFAULT_LOCKER_BACKGROUND);
       setYtSubscribe(false);
       setYtLike(false);
       setYtComment(false);
@@ -194,6 +204,13 @@ export default function CreateLockerForm() {
                 className={inputClassName}
               />
             </div>
+
+            <div className="border-t border-white/[0.06] pt-5">
+              <BackgroundThemePicker
+                value={backgroundTheme}
+                onChange={setBackgroundTheme}
+              />
+            </div>
           </div>
         </motion.div>
 
@@ -257,7 +274,12 @@ export default function CreateLockerForm() {
         transition={{ duration: 0.4, delay: 0.1 }}
         className="lg:sticky lg:top-8 lg:self-start"
       >
-        <LockerPreview title={title} description={description} tasks={previewTasks} />
+        <LockerPreview
+          title={title}
+          description={description}
+          tasks={previewTasks}
+          backgroundTheme={backgroundTheme}
+        />
       </motion.div>
     </form>
   );

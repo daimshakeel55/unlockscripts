@@ -6,6 +6,12 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import TaskSelector from "./TaskSelector";
 import LockerPreview from "./LockerPreview";
+import BackgroundThemePicker from "./locker/BackgroundThemePicker";
+import {
+  DEFAULT_LOCKER_BACKGROUND,
+  isLockerBackgroundTheme,
+  type LockerBackgroundTheme,
+} from "@/lib/locker-backgrounds";
 
 const inputClassName =
   "w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3.5 text-white backdrop-blur-sm outline-none transition-colors placeholder:text-gray-500 focus:border-violet-500/50 focus:bg-white/[0.05]";
@@ -29,6 +35,7 @@ interface Props {
   title: string;
   description: string;
   destinationUrl: string;
+  backgroundTheme?: string | null;
   tasks: Task[];
 }
 
@@ -44,14 +51,22 @@ export default function EditLockerForm({
   title: defaultTitle,
   description: defaultDescription,
   destinationUrl: defaultDestinationUrl,
+  backgroundTheme: defaultBackgroundTheme,
   tasks,
 }: Props) {
   const router = useRouter();
   const reducedMotion = useReducedMotion() ?? false;
 
+  const initialTheme =
+    defaultBackgroundTheme && isLockerBackgroundTheme(defaultBackgroundTheme)
+      ? defaultBackgroundTheme
+      : DEFAULT_LOCKER_BACKGROUND;
+
   const [title, setTitle] = useState<string>(defaultTitle);
   const [description, setDescription] = useState<string>(defaultDescription);
   const [destinationUrl, setDestinationUrl] = useState<string>(defaultDestinationUrl);
+  const [backgroundTheme, setBackgroundTheme] =
+    useState<LockerBackgroundTheme>(initialTheme);
 
   const [ytSubscribe, setYtSubscribe] = useState<boolean>(
     tasks.some((t) => t.type === "youtube_subscribe")
@@ -105,6 +120,7 @@ export default function EditLockerForm({
           title,
           description,
           destination_url: destinationUrl,
+          background_theme: backgroundTheme,
         })
         .eq("id", lockerId)
         .select();
@@ -234,6 +250,13 @@ export default function EditLockerForm({
                 className={inputClassName}
               />
             </div>
+
+            <div className="border-t border-white/[0.06] pt-5">
+              <BackgroundThemePicker
+                value={backgroundTheme}
+                onChange={setBackgroundTheme}
+              />
+            </div>
           </div>
         </motion.div>
 
@@ -297,7 +320,12 @@ export default function EditLockerForm({
         transition={{ duration: 0.4, delay: 0.1 }}
         className="lg:sticky lg:top-8 lg:self-start"
       >
-        <LockerPreview title={title} description={description} tasks={previewTasks} />
+        <LockerPreview
+          title={title}
+          description={description}
+          tasks={previewTasks}
+          backgroundTheme={backgroundTheme}
+        />
       </motion.div>
     </form>
   );
