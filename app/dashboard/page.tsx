@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { getAbsoluteUrl } from "@/lib/site-url";
 
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
@@ -60,7 +61,7 @@ export default function DashboardPage() {
   }
 
   function copyLink(slug: string) {
-    navigator.clipboard.writeText(`http://localhost:3000/l/${slug}`);
+    navigator.clipboard.writeText(getAbsoluteUrl(`/l/${slug}`));
     alert("✅ Link copied!");
   }
 

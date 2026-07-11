@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { getAbsoluteUrl } from "@/lib/site-url";
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
@@ -21,7 +22,7 @@ export default function RegisterPage() {
       email,
       password,
       options: {
-        emailRedirectTo: "https://unlockscripts.com/auth/callback",
+        emailRedirectTo: getAbsoluteUrl("/auth/callback"),
         data: {
           full_name: fullName,
         },
