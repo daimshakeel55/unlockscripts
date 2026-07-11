@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ComponentType, type ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   FaChartLine,
@@ -12,7 +12,6 @@ import {
   FaMobileAlt,
   FaTrophy,
 } from "react-icons/fa";
-import { FaChrome, FaFirefox, FaSafari, FaEdge } from "react-icons/fa6";
 import Sidebar from "@/components/Sidebar";
 import PageBackground from "@/components/ui/PageBackground";
 import { supabase } from "@/lib/supabase";
@@ -43,7 +42,7 @@ function StatCard({
 }: {
   label: string;
   value: string | number;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string }>;
   gradient: string;
   delay: number;
   reducedMotion: boolean;
@@ -214,8 +213,8 @@ function BreakdownChart({
 }: {
   title: string;
   subtitle: string;
-  items: { label: string; count: number; icon?: React.ReactNode; color: string }[];
-  icon: React.ComponentType<{ className?: string }>;
+  items: { label: string; count: number; icon?: ReactNode; color: string }[];
+  icon: ComponentType<{ className?: string }>;
   reducedMotion: boolean;
   delay?: number;
 }) {
@@ -341,8 +340,7 @@ function ConversionRing({
   unlocks: number;
   reducedMotion: boolean;
 }) {
-  const circumference = 2 * Math.PI * 54;
-  const offset = circumference - (rate / 100) * circumference;
+  const safeRate = Number.isFinite(rate) ? Math.min(100, Math.max(0, rate)) : 0;
 
   return (
     <motion.div
@@ -357,39 +355,16 @@ function ConversionRing({
       </div>
 
       <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-center">
-        <div className="relative h-36 w-36">
-          <svg className="h-full w-full -rotate-90" viewBox="0 0 120 120">
-            <circle
-              cx="60"
-              cy="60"
-              r="54"
-              fill="none"
-              stroke="rgba(255,255,255,0.06)"
-              strokeWidth="10"
-            />
-            <motion.circle
-              cx="60"
-              cy="60"
-              r="54"
-              fill="none"
-              stroke="url(#conversionGradient)"
-              strokeWidth="10"
-              strokeLinecap="round"
-              strokeDasharray={circumference}
-              initial={reducedMotion ? { strokeDashoffset: offset } : { strokeDashoffset: circumference }}
-              animate={{ strokeDashoffset: offset }}
-              transition={{ delay: 0.4, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            />
-            <defs>
-              <linearGradient id="conversionGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#7c3aed" />
-                <stop offset="100%" stopColor="#e879f9" />
-              </linearGradient>
-            </defs>
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <div className="relative flex h-36 w-36 items-center justify-center">
+          <div
+            className="absolute inset-0 rounded-full"
+            style={{
+              background: `conic-gradient(from 0deg, #7c3aed ${safeRate}%, rgba(255,255,255,0.06) ${safeRate}%)`,
+            }}
+          />
+          <div className="absolute inset-[10px] flex flex-col items-center justify-center rounded-full bg-[#0B0B0F]">
             <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-3xl font-bold text-transparent">
-              {rate}%
+              {safeRate}%
             </span>
             <span className="text-xs text-gray-500">rate</span>
           </div>
@@ -426,18 +401,20 @@ function parseBrowser(userAgent: string | null): string {
 }
 
 function browserIcon(name: string) {
-  switch (name) {
-    case "Chrome":
-      return <FaChrome className="text-yellow-400" />;
-    case "Firefox":
-      return <FaFirefox className="text-orange-400" />;
-    case "Safari":
-      return <FaSafari className="text-sky-400" />;
-    case "Edge":
-      return <FaEdge className="text-blue-400" />;
-    default:
-      return <FaGlobeAmericas className="text-gray-400" />;
-  }
+  const colors: Record<string, string> = {
+    Chrome: "bg-yellow-400",
+    Firefox: "bg-orange-400",
+    Safari: "bg-sky-400",
+    Edge: "bg-blue-400",
+    Other: "bg-gray-400",
+  };
+
+  return (
+    <span
+      className={`inline-block h-2.5 w-2.5 rounded-full ${colors[name] ?? colors.Other}`}
+      aria-hidden="true"
+    />
+  );
 }
 
 function countByKey<T>(
@@ -456,6 +433,7 @@ function countByKey<T>(
 
 export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [totalViews, setTotalViews] = useState(0);
   const [totalLockers, setTotalLockers] = useState(0);
   const [totalUnlocks, setTotalUnlocks] = useState(0);
@@ -469,35 +447,53 @@ export default function AnalyticsPage() {
   }, []);
 
   async function loadAnalytics() {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    try {
+      setError("");
 
-    if (!user) {
-      window.location.href = "/login";
-      return;
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError) throw authError;
+
+      if (!user) {
+        window.location.href = "/login";
+        return;
+      }
+
+      const { data: lockerData, error: lockerError } = await supabase
+        .from("lockers")
+        .select("id, title, views")
+        .eq("user_id", user.id);
+
+      if (lockerError) throw lockerError;
+
+      const { data: analyticsData, error: analyticsError } = await supabase
+        .from("analytics_events")
+        .select("*")
+        .eq("owner_id", user.id);
+
+      if (analyticsError) throw analyticsError;
+
+      const views =
+        lockerData?.reduce((sum, locker) => sum + Number(locker.views || 0), 0) || 0;
+      const unlocks =
+        analyticsData?.filter((e) => e.event_type === "unlock").length || 0;
+
+      setLockers(lockerData || []);
+      setEvents(analyticsData || []);
+      setTotalViews(views);
+      setTotalLockers(lockerData?.length || 0);
+      setTotalUnlocks(unlocks);
+      setConversionRate(views > 0 ? Math.round((unlocks / views) * 100) : 0);
+    } catch (err) {
+      console.error("Analytics load failed:", err);
+      const message = err instanceof Error ? err.message : "Failed to load analytics";
+      setError(message);
+    } finally {
+      setLoading(false);
     }
-
-    const { data: lockerData } = await supabase
-      .from("lockers")
-      .select("id, title, views")
-      .eq("user_id", user.id);
-
-    const { data: analyticsData } = await supabase
-      .from("analytics_events")
-      .select("*")
-      .eq("owner_id", user.id);
-
-    const views = lockerData?.reduce((sum, locker) => sum + (locker.views || 0), 0) || 0;
-    const unlocks = analyticsData?.filter((e) => e.event_type === "unlock").length || 0;
-
-    setLockers(lockerData || []);
-    setEvents(analyticsData || []);
-    setTotalViews(views);
-    setTotalLockers(lockerData?.length || 0);
-    setTotalUnlocks(unlocks);
-    setConversionRate(views > 0 ? Math.round((unlocks / views) * 100) : 0);
-    setLoading(false);
   }
 
   const trafficData = useMemo(() => {
@@ -596,6 +592,21 @@ export default function AnalyticsPage() {
                   className="h-28 animate-pulse rounded-2xl border border-white/[0.06] bg-white/[0.03]"
                 />
               ))}
+            </div>
+          ) : error ? (
+            <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-6 text-center backdrop-blur-xl">
+              <p className="font-semibold text-red-300">Could not load analytics</p>
+              <p className="mt-2 text-sm text-red-200/80">{error}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setLoading(true);
+                  loadAnalytics();
+                }}
+                className="mt-4 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-violet-500"
+              >
+                Try Again
+              </button>
             </div>
           ) : (
             <>
