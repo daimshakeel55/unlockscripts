@@ -32,16 +32,12 @@ export default function LockerPreview({
       case "youtube_comment":
       case "youtube_watch":
         return <FaYoutube className="text-red-500" />;
-
       case "discord":
         return <FaDiscord className="text-indigo-400" />;
-
       case "telegram":
         return <FaTelegram className="text-sky-400" />;
-
       case "website":
         return <FaGlobe className="text-green-400" />;
-
       default:
         return <FaCheckCircle className="text-gray-400" />;
     }
@@ -50,38 +46,35 @@ export default function LockerPreview({
   const enabledTasks = tasks.filter((task) => task.active);
 
   return (
-    <div className="rounded-2xl border border-gray-800 bg-[#111116] p-6">
-      <h2 className="mb-6 text-2xl font-bold">Live Preview</h2>
+    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-5 backdrop-blur-xl sm:p-6">
+      <h2 className="mb-1 text-lg font-bold text-white sm:text-xl">Live Preview</h2>
+      <p className="mb-6 text-sm text-gray-500">See how your locker will look</p>
 
-      <div className="rounded-xl border border-gray-700 bg-[#18181F] p-6">
-        <h1 className="text-3xl font-bold">
+      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 sm:p-6">
+        <h1 className="text-xl font-bold sm:text-2xl md:text-3xl">
           {title || "Your Locker Title"}
         </h1>
 
-        <p className="mt-3 text-gray-400">
+        <p className="mt-3 text-sm text-gray-400 sm:text-base">
           {description || "Locker description will appear here."}
         </p>
 
-        <div className="mt-8 space-y-3">
+        <div className="mt-6 space-y-3 sm:mt-8">
           {enabledTasks.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-gray-700 p-6 text-center text-gray-500">
+            <div className="rounded-xl border border-dashed border-white/10 p-6 text-center text-sm text-gray-500">
               No tasks selected
             </div>
           ) : (
             enabledTasks.map((task, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between rounded-xl border border-gray-700 bg-[#202028] px-4 py-3"
+                className="flex items-center justify-between gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-3 sm:px-4"
               >
-                <div className="flex items-center gap-3">
-                  <div className="text-xl">
-                    {getIcon(task.type)}
-                  </div>
-
-                  <span>{task.title}</span>
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="shrink-0 text-lg sm:text-xl">{getIcon(task.type)}</div>
+                  <span className="truncate text-sm sm:text-base">{task.title}</span>
                 </div>
-
-                <span className="rounded-lg bg-violet-600 px-3 py-1 text-xs font-semibold">
+                <span className="shrink-0 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 px-2 py-1 text-[10px] font-semibold sm:px-3 sm:text-xs">
                   Required
                 </span>
               </div>
@@ -91,7 +84,7 @@ export default function LockerPreview({
 
         <button
           type="button"
-          className="mt-8 w-full rounded-xl bg-violet-600 py-3 font-semibold text-white"
+          className="mt-6 w-full rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 py-3 text-sm font-semibold text-white sm:mt-8"
         >
           Unlock Content
         </button>

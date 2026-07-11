@@ -34,8 +34,8 @@ function TaskCard({
     <div
       className={`overflow-hidden rounded-xl border transition-all duration-300 ${
         active
-          ? "border-violet-500 bg-violet-500/10"
-          : "border-gray-700 bg-[#18181F] hover:border-violet-500 hover:bg-[#20202A]"
+          ? "border-violet-500 bg-violet-500/10 shadow-lg shadow-violet-900/20"
+          : "border-white/[0.06] bg-white/[0.02] hover:border-violet-500/30 hover:bg-white/[0.04]"
       }`}
     >
       <button type="button" onClick={onClick} className="w-full p-4 text-left">
@@ -49,7 +49,9 @@ function TaskCard({
 
           <span
             className={`rounded-full px-3 py-1 text-xs font-semibold ${
-              active ? "bg-violet-600 text-white" : "bg-gray-700 text-gray-300"
+              active
+                ? "bg-violet-600 text-white"
+                : "border border-white/10 bg-white/[0.04] text-gray-400"
             }`}
           >
             {active ? "Selected" : "Select"}
@@ -58,7 +60,7 @@ function TaskCard({
       </button>
 
       {active && onUrlChange && (
-        <div className="border-t border-violet-500/20 bg-[#14141c] px-4 py-3">
+        <div className="border-t border-violet-500/20 bg-violet-500/5 px-4 py-3">
           <label className="mb-2 block text-xs font-medium text-violet-300">
             {urlLabel ?? "Task URL"}
           </label>
@@ -67,8 +69,9 @@ function TaskCard({
             value={url ?? ""}
             onChange={(e) => onUrlChange(e.target.value)}
             placeholder={urlPlaceholder}
+            autoFocus
             onClick={(e) => e.stopPropagation()}
-            className="w-full rounded-lg border border-gray-700 bg-[#18181F] px-3 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-gray-500 focus:border-violet-500"
+            className="w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-gray-500 focus:border-violet-500/50 focus:bg-white/[0.05]"
           />
         </div>
       )}
@@ -151,7 +154,7 @@ export default function TaskSelector(props: Props) {
   } = props;
 
   return (
-    <div className="rounded-2xl border border-gray-800 bg-[#18181F] p-4 sm:p-6">
+    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-4 backdrop-blur-xl sm:p-6">
       <h2 className="mb-6 text-xl font-bold text-white sm:mb-8 sm:text-2xl">
         Required Tasks
       </h2>

@@ -1,17 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
-
 import TaskSelector from "./TaskSelector";
 import LockerPreview from "./LockerPreview";
 
-import {
-  FaYoutube,
-  FaDiscord,
-  FaTelegram,
-  FaGlobe,
-} from "react-icons/fa";
+const inputClassName =
+  "w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3.5 text-white backdrop-blur-sm outline-none transition-colors placeholder:text-gray-500 focus:border-violet-500/50 focus:bg-white/[0.05]";
+
+const labelClassName = "mb-2 block text-sm font-medium text-gray-300";
 
 interface Task {
   type: string;
@@ -50,6 +48,8 @@ export default function CreateLockerForm() {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
+
+  const reducedMotion = useReducedMotion() ?? false;
 
   async function saveLocker(e: React.FormEvent) {
     e.preventDefault();
@@ -154,40 +154,55 @@ export default function CreateLockerForm() {
   ];
 
   return (
-    <form onSubmit={saveLocker} className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-      <div className="space-y-6">
-        <div>
-          <label className="mb-2 block text-sm font-medium">Locker Title</label>
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter locker title"
-            className="w-full rounded-xl border border-gray-700 bg-[#18181F] p-4 text-white outline-none focus:border-violet-500"
-          />
-        </div>
+    <form onSubmit={saveLocker} className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
+      <div className="space-y-5">
+        <motion.div
+          initial={reducedMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-5 backdrop-blur-xl sm:p-6"
+        >
+          <h2 className="mb-5 text-lg font-semibold text-white">Locker Details</h2>
+          <div className="space-y-4">
+            <div>
+              <label className={labelClassName}>Locker Title</label>
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter locker title"
+                className={inputClassName}
+              />
+            </div>
 
-        <div>
-          <label className="mb-2 block text-sm font-medium">Description</label>
-          <textarea
-            rows={4}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe your locker..."
-            className="w-full rounded-xl border border-gray-700 bg-[#18181F] p-4 text-white outline-none focus:border-violet-500"
-          />
-        </div>
+            <div>
+              <label className={labelClassName}>Description</label>
+              <textarea
+                rows={4}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Describe your locker..."
+                className={inputClassName}
+              />
+            </div>
 
-        <div>
-          <label className="mb-2 block text-sm font-medium">Destination URL</label>
-          <input
-            value={destinationUrl}
-            onChange={(e) => setDestinationUrl(e.target.value)}
-            placeholder="https://..."
-            className="w-full rounded-xl border border-gray-700 bg-[#18181F] p-4 text-white outline-none focus:border-violet-500"
-          />
-        </div>
+            <div>
+              <label className={labelClassName}>Destination URL</label>
+              <input
+                value={destinationUrl}
+                onChange={(e) => setDestinationUrl(e.target.value)}
+                placeholder="https://..."
+                className={inputClassName}
+              />
+            </div>
+          </div>
+        </motion.div>
 
-        <TaskSelector
+        <motion.div
+          initial={reducedMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.05 }}
+        >
+          <TaskSelector
           ytSubscribe={ytSubscribe}
           setYtSubscribe={setYtSubscribe}
           ytSubscribeUrl={ytSubscribeUrl}
@@ -216,16 +231,34 @@ export default function CreateLockerForm() {
           setWebsite={setWebsite}
           websiteUrl={websiteUrl}
           setWebsiteUrl={setWebsiteUrl}
-        />
+          />
+        </motion.div>
 
-        {message && <p className={message.startsWith("❌") ? "text-red-400" : "text-green-400"}>{message}</p>}
+        {message && (
+          <p className={`text-sm ${message.startsWith("❌") ? "text-red-400" : "text-green-400"}`}>
+            {message}
+          </p>
+        )}
 
-        <button type="submit" disabled={loading} className="w-full rounded-xl bg-violet-600 py-4 font-bold text-white transition hover:bg-violet-500 disabled:opacity-50">
+        <motion.button
+          type="submit"
+          disabled={loading}
+          whileHover={reducedMotion ? undefined : { scale: 1.01 }}
+          whileTap={reducedMotion ? undefined : { scale: 0.99 }}
+          className="w-full rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 py-4 font-bold text-white shadow-lg shadow-violet-900/30 transition-all hover:brightness-110 disabled:opacity-50"
+        >
           {loading ? "Creating..." : "Create Locker"}
-        </button>
+        </motion.button>
       </div>
 
-      <LockerPreview title={title} description={description} tasks={previewTasks} />
+      <motion.div
+        initial={reducedMotion ? false : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="lg:sticky lg:top-8 lg:self-start"
+      >
+        <LockerPreview title={title} description={description} tasks={previewTasks} />
+      </motion.div>
     </form>
   );
 }
