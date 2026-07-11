@@ -22,7 +22,7 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-white/[0.06] bg-[#0B0B0F]/90 backdrop-blur-xl lg:flex">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex flex-col border-r border-white/[0.06] bg-[#0B0B0F]/90 backdrop-blur-xl lg:flex">
         <div className="border-b border-white/[0.06] p-6 xl:p-8">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-lg shadow-violet-900/30">
@@ -35,7 +35,7 @@ export default function Sidebar() {
           </div>
         </div>
 
-        <nav className="flex-1 space-y-1.5 p-4 xl:p-6">
+        <nav className="flex-1 space-y-1.5 overflow-y-auto p-4 xl:p-6">
           {menu.map((item) => {
             const Icon = item.icon;
             const active = pathname === item.href;
@@ -57,7 +57,7 @@ export default function Sidebar() {
           })}
         </nav>
 
-        <div className="border-t border-white/[0.06] p-4 xl:p-6">
+        <div className="mt-auto shrink-0 border-t border-white/[0.06] p-4 xl:p-6">
           <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 backdrop-blur-sm">
             <p className="text-sm font-semibold text-white">UnlockScripts</p>
             <p className="mt-1 text-xs text-gray-500">Version 1.0</p>
