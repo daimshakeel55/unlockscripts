@@ -258,8 +258,8 @@ export default function DashboardPage() {
     loadLockers();
   }
 
-  function copyLink(slug: string) {
-    navigator.clipboard.writeText(getAbsoluteUrl(`/l/${slug}`));
+  async function copyLink(slug: string) {
+    await navigator.clipboard.writeText(getAbsoluteUrl(`/l/${slug}`));
   }
 
   const stats = useMemo(() => {
