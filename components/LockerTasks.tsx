@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   FaYoutube,
   FaDiscord,
@@ -33,6 +34,7 @@ export default function LockerTasks({
 }: Props) {
   const [completed, setCompleted] = useState<string[]>([]);
   const [running, setRunning] = useState<string[]>([]);
+  const reducedMotion = useReducedMotion() ?? false;
 
   const trackEvent = async (eventType: string) => {
     try {
@@ -57,9 +59,7 @@ export default function LockerTasks({
           ownerId,
           eventType,
           browser: navigator.userAgent,
-          device: /Mobi/i.test(navigator.userAgent)
-            ? "Mobile"
-            : "Desktop",
+          device: /Mobi/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
           country,
           ipAddress: "",
         }),
@@ -74,10 +74,7 @@ export default function LockerTasks({
   }, []);
 
   function completeTask(task: Task) {
-    if (
-      completed.includes(task.id) ||
-      running.includes(task.id)
-    ) {
+    if (completed.includes(task.id) || running.includes(task.id)) {
       return;
     }
 
@@ -87,28 +84,21 @@ export default function LockerTasks({
 
     setTimeout(() => {
       setCompleted((prev) => [...prev, task.id]);
-      setRunning((prev) =>
-        prev.filter((id) => id !== task.id)
-      );
+      setRunning((prev) => prev.filter((id) => id !== task.id));
     }, 10000);
   }
 
-  const allCompleted =
-    tasks.length > 0 &&
-    completed.length === tasks.length;
+  const allCompleted = tasks.length > 0 && completed.length === tasks.length;
 
   const percentage =
-    tasks.length === 0
-      ? 0
-      : Math.round(
-          (completed.length / tasks.length) * 100
-        );
+    tasks.length === 0 ? 0 : Math.round((completed.length / tasks.length) * 100);
 
   function getTaskStyle(type: string) {
     if (type.startsWith("youtube")) {
       return {
-        bg: "bg-red-500/10",
-        text: "text-red-500",
+        bg: "bg-red-500/15",
+        text: "text-red-400",
+        glow: "shadow-red-500/20",
         icon: <FaYoutube className="text-xl" />,
         label: (() => {
           switch (type) {
@@ -129,8 +119,9 @@ export default function LockerTasks({
 
     if (type === "discord") {
       return {
-        bg: "bg-indigo-500/10",
+        bg: "bg-indigo-500/15",
         text: "text-indigo-400",
+        glow: "shadow-indigo-500/20",
         icon: <FaDiscord className="text-xl" />,
         label: "Discord",
       };
@@ -138,16 +129,18 @@ export default function LockerTasks({
 
     if (type === "telegram") {
       return {
-        bg: "bg-sky-500/10",
+        bg: "bg-sky-500/15",
         text: "text-sky-400",
+        glow: "shadow-sky-500/20",
         icon: <FaTelegram className="text-xl" />,
         label: "Telegram",
       };
     }
 
     return {
-      bg: "bg-green-500/10",
+      bg: "bg-green-500/15",
       text: "text-green-400",
+      glow: "shadow-green-500/20",
       icon: <FaGlobe className="text-xl" />,
       label: "Website",
     };
@@ -155,126 +148,113 @@ export default function LockerTasks({
 
   return (
     <div className="w-full">
-
-      <div className="mb-8 text-center">
-
-        <h2 className="text-3xl font-bold text-white">
-          Complete the tasks below
-        </h2>
-
-        <p className="mt-2 text-gray-400">
+      <div className="mb-6 text-center sm:mb-8">
+        <h2 className="text-xl font-bold text-white sm:text-2xl">Complete the tasks below</h2>
+        <p className="mt-2 text-sm text-gray-500">
           Finish every required task to unlock your content.
         </p>
-
       </div>
 
-      <div className="space-y-4">        {tasks.map((task) => {
+      <div className="space-y-3">
+        {tasks.map((task, index) => {
           const style = getTaskStyle(task.type);
-
           const isCompleted = completed.includes(task.id);
           const isRunning = running.includes(task.id);
 
           return (
-            <div
+            <motion.div
               key={task.id}
-              className={`flex items-center justify-between rounded-2xl border p-5 transition-all ${
+              initial={reducedMotion ? false : { opacity: 0, x: -12 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.08, duration: 0.4 }}
+              className={`flex flex-col gap-4 rounded-2xl border p-4 transition-all sm:flex-row sm:items-center sm:justify-between sm:p-5 ${
                 isCompleted
-                  ? "border-green-500/30 bg-[#18181F]"
-                  : "border-gray-700 bg-[#18181F] hover:border-violet-500"
+                  ? "border-green-500/30 bg-green-500/[0.06]"
+                  : isRunning
+                    ? "border-amber-500/30 bg-amber-500/[0.06]"
+                    : "border-white/[0.08] bg-white/[0.03] hover:border-violet-500/30 hover:bg-white/[0.05]"
               }`}
             >
               <div className="flex items-center gap-4">
-
                 <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-xl ${style.bg} ${style.text}`}
+                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${style.bg} ${style.text} shadow-lg ${style.glow}`}
                 >
                   {style.icon}
                 </div>
 
-                <div>
-
-                  <h3 className="text-base font-semibold text-white">
-                    {task.title}
-                  </h3>
-
-                  <p className="mt-1 text-xs font-medium text-gray-500">
-                    {style.label}
-                  </p>
-
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-white">{task.title}</h3>
+                  <p className="mt-0.5 text-xs font-medium text-gray-500">{style.label}</p>
                 </div>
-
               </div>
 
               <button
                 type="button"
                 onClick={() => completeTask(task)}
                 disabled={isCompleted || isRunning}
-                className={`rounded-xl px-5 py-2 font-semibold transition-all ${
+                className={`shrink-0 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all ${
                   isCompleted
-                    ? "bg-green-600 text-white"
+                    ? "bg-green-600/90 text-white"
                     : isRunning
-                    ? "bg-amber-500 text-black"
-                    : "bg-violet-600 text-white hover:bg-violet-500"
-                }`}
+                      ? "bg-amber-500/90 text-black"
+                      : "bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-lg shadow-violet-900/30 hover:brightness-110"
+                } disabled:opacity-80`}
               >
                 {isCompleted ? (
-                  <span className="flex items-center gap-2">
-                    <FaCheck />
+                  <span className="flex items-center justify-center gap-2">
+                    <FaCheck aria-hidden="true" />
                     Completed
                   </span>
                 ) : isRunning ? (
-                  <span className="flex items-center gap-2">
-                    <FaClock className="animate-spin" />
+                  <span className="flex items-center justify-center gap-2">
+                    <FaClock className="animate-spin" aria-hidden="true" />
                     Waiting...
                   </span>
                 ) : (
                   "Complete Task"
                 )}
               </button>
-
-            </div>
+            </motion.div>
           );
         })}
-      </div>      <div className="mt-8 rounded-2xl border border-gray-700 bg-[#18181F] p-6">
+      </div>
 
-<div className="mb-3 flex items-center justify-between">
+      <div className="mt-6 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5 backdrop-blur-sm sm:mt-8 sm:p-6">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-sm font-medium text-gray-400">Progress</span>
+          <span className="text-sm font-bold text-violet-300">
+            {completed.length} / {tasks.length} • {percentage}%
+          </span>
+        </div>
 
-  <span className="text-sm font-medium text-gray-400">
-    Progress
-  </span>
+        <div className="h-2.5 overflow-hidden rounded-full bg-white/[0.06]">
+          <motion.div
+            initial={false}
+            animate={{ width: `${percentage}%` }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="h-full rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-500"
+          />
+        </div>
 
-  <span className="text-sm font-bold text-white">
-    {completed.length} / {tasks.length} • {percentage}%
-  </span>
-
-</div>
-
-<div className="h-3 overflow-hidden rounded-full bg-gray-700">
-
-  <div
-    className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-all duration-500"
-    style={{
-      width: `${percentage}%`,
-    }}
-  />
-
-</div>        {allCompleted ? (
-          <button
+        {allCompleted ? (
+          <motion.button
             type="button"
             onClick={async () => {
               await trackEvent("unlock");
               window.open(destinationUrl, "_blank");
             }}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 py-4 font-bold text-white transition hover:bg-green-500"
+            whileHover={reducedMotion ? undefined : { scale: 1.01 }}
+            whileTap={reducedMotion ? undefined : { scale: 0.99 }}
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-500 py-4 text-sm font-bold text-white shadow-lg shadow-green-900/30 transition-all hover:brightness-110 sm:text-base"
           >
-            <FaLockOpen />
+            <FaLockOpen aria-hidden="true" />
             Unlock Content
-          </button>
+          </motion.button>
         ) : (
           <button
             type="button"
             disabled
-            className="mt-6 w-full cursor-not-allowed rounded-xl bg-gray-700 py-4 font-bold text-gray-400"
+            className="mt-6 w-full cursor-not-allowed rounded-xl border border-white/[0.06] bg-white/[0.02] py-4 text-sm font-bold text-gray-500 sm:text-base"
           >
             Complete all tasks to unlock
           </button>
