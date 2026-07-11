@@ -190,31 +190,33 @@ export default function CreateLockerForm() {
         <TaskSelector
           ytSubscribe={ytSubscribe}
           setYtSubscribe={setYtSubscribe}
+          ytSubscribeUrl={ytSubscribeUrl}
+          setYtSubscribeUrl={setYtSubscribeUrl}
           ytLike={ytLike}
           setYtLike={setYtLike}
+          ytLikeUrl={ytLikeUrl}
+          setYtLikeUrl={setYtLikeUrl}
           ytComment={ytComment}
           setYtComment={setYtComment}
+          ytCommentUrl={ytCommentUrl}
+          setYtCommentUrl={setYtCommentUrl}
           ytWatch={ytWatch}
           setYtWatch={setYtWatch}
+          ytWatchUrl={ytWatchUrl}
+          setYtWatchUrl={setYtWatchUrl}
           discord={discord}
           setDiscord={setDiscord}
+          discordUrl={discordUrl}
+          setDiscordUrl={setDiscordUrl}
           telegram={telegram}
           setTelegram={setTelegram}
+          telegramUrl={telegramUrl}
+          setTelegramUrl={setTelegramUrl}
           website={website}
           setWebsite={setWebsite}
+          websiteUrl={websiteUrl}
+          setWebsiteUrl={setWebsiteUrl}
         />
-
-        {(ytSubscribe || ytLike || ytComment || ytWatch || discord || telegram || website) && (
-          <div className="space-y-4">
-            {ytSubscribe && <input value={ytSubscribeUrl} onChange={(e) => setYtSubscribeUrl(e.target.value)} placeholder="YouTube Subscribe URL" className="w-full rounded-xl border border-gray-700 bg-[#18181F] p-4 text-white outline-none focus:border-violet-500" />}
-            {ytLike && <input value={ytLikeUrl} onChange={(e) => setYtLikeUrl(e.target.value)} placeholder="YouTube Like URL" className="w-full rounded-xl border border-gray-700 bg-[#18181F] p-4 text-white outline-none focus:border-violet-500" />}
-            {ytComment && <input value={ytCommentUrl} onChange={(e) => setYtCommentUrl(e.target.value)} placeholder="YouTube Comment URL" className="w-full rounded-xl border border-gray-700 bg-[#18181F] p-4 text-white outline-none focus:border-violet-500" />}
-            {ytWatch && <input value={ytWatchUrl} onChange={(e) => setYtWatchUrl(e.target.value)} placeholder="YouTube Watch URL" className="w-full rounded-xl border border-gray-700 bg-[#18181F] p-4 text-white outline-none focus:border-violet-500" />}
-            {discord && <input value={discordUrl} onChange={(e) => setDiscordUrl(e.target.value)} placeholder="Discord Invite URL" className="w-full rounded-xl border border-gray-700 bg-[#18181F] p-4 text-white outline-none focus:border-violet-500" />}
-            {telegram && <input value={telegramUrl} onChange={(e) => setTelegramUrl(e.target.value)} placeholder="Telegram Channel URL" className="w-full rounded-xl border border-gray-700 bg-[#18181F] p-4 text-white outline-none focus:border-violet-500" />}
-            {website && <input value={websiteUrl} onChange={(e) => setWebsiteUrl(e.target.value)} placeholder="Website URL" className="w-full rounded-xl border border-gray-700 bg-[#18181F] p-4 text-white outline-none focus:border-violet-500" />}
-          </div>
-        )}
 
         {message && <p className={message.startsWith("❌") ? "text-red-400" : "text-green-400"}>{message}</p>}
 
