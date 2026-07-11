@@ -21,6 +21,7 @@ export default function RegisterPage() {
       email,
       password,
       options: {
+        emailRedirectTo: "https://unlockscripts.com/auth/callback",
         data: {
           full_name: fullName,
         },
@@ -30,7 +31,10 @@ export default function RegisterPage() {
     if (error) {
       setMessage(error.message);
     } else {
-      setMessage("✅ Account created! Check your email.");
+      setMessage("✅ Account created! Check your email to verify your account.");
+      setFullName("");
+      setEmail("");
+      setPassword("");
     }
 
     setLoading(false);
@@ -39,7 +43,6 @@ export default function RegisterPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#0B0B0F] px-6 text-white">
       <div className="w-full max-w-md rounded-2xl border border-gray-800 bg-[#18181F] p-8">
-
         <h1 className="text-center text-3xl font-bold">
           Create Account
         </h1>
@@ -55,6 +58,7 @@ export default function RegisterPage() {
             placeholder="Full Name"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
+            required
             className="w-full rounded-lg border border-gray-700 bg-[#111118] px-4 py-3 outline-none focus:border-violet-500"
           />
 
@@ -63,6 +67,7 @@ export default function RegisterPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
             className="w-full rounded-lg border border-gray-700 bg-[#111118] px-4 py-3 outline-none focus:border-violet-500"
           />
 
@@ -71,6 +76,8 @@ export default function RegisterPage() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={6}
             className="w-full rounded-lg border border-gray-700 bg-[#111118] px-4 py-3 outline-none focus:border-violet-500"
           />
 
@@ -89,7 +96,6 @@ export default function RegisterPage() {
           )}
 
         </form>
-
       </div>
     </main>
   );
