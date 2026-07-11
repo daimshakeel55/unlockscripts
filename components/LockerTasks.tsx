@@ -90,7 +90,7 @@ export default function LockerTasks({
       setRunning((prev) =>
         prev.filter((id) => id !== task.id)
       );
-    }, 35000);
+    }, 10000);
   }
 
   const allCompleted =
