@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useToast } from "@/components/ui/Toast";
 import TaskSelector from "./TaskSelector";
 import LockerPreview from "./LockerPreview";
 import BackgroundThemePicker from "./locker/BackgroundThemePicker";
@@ -12,6 +13,7 @@ import {
   isLockerBackgroundTheme,
   type LockerBackgroundTheme,
 } from "@/lib/locker-backgrounds";
+import { YOUTUBE_SUBSCRIBE_TITLE } from "@/lib/task-titles";
 
 const inputClassName =
   "w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3.5 text-white backdrop-blur-sm outline-none transition-colors placeholder:text-gray-500 focus:border-violet-500/50 focus:bg-white/[0.05]";
@@ -55,6 +57,7 @@ export default function EditLockerForm({
   tasks,
 }: Props) {
   const router = useRouter();
+  const { success, error: showError } = useToast();
   const reducedMotion = useReducedMotion() ?? false;
 
   const initialTheme =
@@ -105,13 +108,11 @@ export default function EditLockerForm({
   );
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [message, setMessage] = useState<string>("");
 
   async function updateLocker(e: React.FormEvent) {
     e.preventDefault();
 
     setLoading(true);
-    setMessage("");
 
     try {
       const { data, error } = await supabase
@@ -141,7 +142,7 @@ export default function EditLockerForm({
         newTasks.push({
           locker_id: lockerId,
           type: "youtube_subscribe",
-          title: "Subscribe to Channel",
+          title: YOUTUBE_SUBSCRIBE_TITLE,
           url: ytSubscribeUrl,
         });
       if (ytLike)
@@ -192,18 +193,18 @@ export default function EditLockerForm({
         if (insertError) throw insertError;
       }
 
-      setMessage("✅ Locker updated successfully!");
+      success("Locker updated", "Your changes have been saved.");
       router.refresh();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
-      setMessage(`❌ ${errorMessage}`);
+      showError("Could not update locker", errorMessage);
     } finally {
       setLoading(false);
     }
   }
 
   const previewTasks: PreviewTask[] = [
-    { title: "Subscribe to Channel", active: ytSubscribe, type: "youtube_subscribe" },
+    { title: YOUTUBE_SUBSCRIBE_TITLE, active: ytSubscribe, type: "youtube_subscribe" },
     { title: "Like Video", active: ytLike, type: "youtube_like" },
     { title: "Comment on Video", active: ytComment, type: "youtube_comment" },
     { title: "Watch Video", active: ytWatch, type: "youtube_watch" },
@@ -296,12 +297,6 @@ export default function EditLockerForm({
             setWebsiteUrl={setWebsiteUrl}
           />
         </motion.div>
-
-        {message && (
-          <p className={`text-sm ${message.startsWith("❌") ? "text-red-400" : "text-green-400"}`}>
-            {message}
-          </p>
-        )}
 
         <motion.button
           type="submit"

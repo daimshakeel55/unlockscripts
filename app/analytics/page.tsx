@@ -55,14 +55,14 @@ function StatCard({
       className="group relative"
     >
       <div
-        className={`pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br ${gradient} opacity-40 transition-opacity group-hover:opacity-70`}
+        className={`pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br ${gradient} opacity-20 transition-opacity group-hover:opacity-35`}
         aria-hidden="true"
       />
-      <div className="relative rounded-2xl border border-white/[0.06] bg-white/[0.03] p-6 backdrop-blur-xl">
+      <div className="relative rounded-2xl border border-white/[0.08] bg-[#0c0c12]/90 p-6 backdrop-blur-xl">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-sm text-gray-500">{label}</p>
-            <p className="mt-2 bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-3xl font-bold text-transparent">
+            <p className="text-sm font-medium text-gray-400">{label}</p>
+            <p className="mt-2 text-4xl font-extrabold tabular-nums tracking-tight text-white">
               {value}
             </p>
           </div>

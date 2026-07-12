@@ -11,6 +11,7 @@ import {
   FaClock,
   FaLockOpen,
 } from "react-icons/fa";
+import { getTaskDisplayTitle } from "@/lib/task-titles";
 
 type Task = {
   id: string;
@@ -103,7 +104,7 @@ export default function LockerTasks({
         label: (() => {
           switch (type) {
             case "youtube_subscribe":
-              return "Subscribe";
+              return "Subscribe & Notify";
             case "youtube_like":
               return "Like";
             case "youtube_comment":
@@ -185,7 +186,9 @@ export default function LockerTasks({
                   </div>
 
                   <div className="min-w-0">
-                    <h3 className="font-semibold text-white">{task.title}</h3>
+                    <h3 className="font-semibold text-white">
+                      {getTaskDisplayTitle(task.type, task.title)}
+                    </h3>
                     <p className="mt-0.5 text-xs uppercase tracking-wider text-gray-500">
                       {style.label}
                     </p>

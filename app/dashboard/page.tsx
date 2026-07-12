@@ -14,7 +14,9 @@ import {
   FaLink,
 } from "react-icons/fa";
 import { supabase } from "@/lib/supabase";
+import { copyToClipboard } from "@/lib/copy-to-clipboard";
 import { getAbsoluteUrl } from "@/lib/site-url";
+import { useToast } from "@/components/ui/Toast";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import AppPageLayout from "@/components/layout/AppPageLayout";
@@ -53,14 +55,14 @@ function StatCard({
       className="group relative"
     >
       <div
-        className={`pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br ${gradient} opacity-40 transition-opacity group-hover:opacity-70`}
+        className={`pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br ${gradient} opacity-20 transition-opacity group-hover:opacity-35`}
         aria-hidden="true"
       />
-      <div className="relative rounded-2xl border border-white/[0.06] bg-white/[0.03] p-6 backdrop-blur-xl">
+      <div className="relative rounded-2xl border border-white/[0.08] bg-[#0c0c12]/90 p-6 backdrop-blur-xl">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-sm text-gray-500">{label}</p>
-            <p className="mt-2 bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-3xl font-bold text-transparent">
+            <p className="text-sm font-medium text-gray-400">{label}</p>
+            <p className="mt-2 text-4xl font-extrabold tabular-nums tracking-tight text-white">
               {value}
             </p>
           </div>
@@ -219,6 +221,7 @@ function LockerCard({
 }
 
 export default function DashboardPage() {
+  const { success, error } = useToast();
   const [lockers, setLockers] = useState<Locker[]>([]);
   const [loading, setLoading] = useState(true);
   const reducedMotion = useReducedMotion() ?? false;
@@ -237,13 +240,13 @@ export default function DashboardPage() {
       return;
     }
 
-    const { data, error } = await supabase
+    const { data, error: loadError } = await supabase
       .from("lockers")
       .select("*")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
-    if (!error && data) {
+    if (!loadError && data) {
       setLockers(data);
     }
 
@@ -253,13 +256,26 @@ export default function DashboardPage() {
   async function deleteLocker(id: string) {
     if (!confirm("Delete this locker?")) return;
 
-    await supabase.from("lockers").delete().eq("id", id);
+    const { error: deleteError } = await supabase.from("lockers").delete().eq("id", id);
 
+    if (deleteError) {
+      error("Could not delete locker", deleteError.message);
+      return;
+    }
+
+    success("Locker deleted");
     loadLockers();
   }
 
   async function copyLink(slug: string) {
-    await navigator.clipboard.writeText(getAbsoluteUrl(`/l/${slug}`));
+    const lockerUrl = getAbsoluteUrl(`/l/${slug}`);
+    const copied = await copyToClipboard(lockerUrl);
+
+    if (copied) {
+      success("Link copied", "Locker link copied to clipboard.");
+    } else {
+      error("Copy failed", "Could not copy the link. Please try again.");
+    }
   }
 
   const stats = useMemo(() => {

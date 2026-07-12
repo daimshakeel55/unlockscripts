@@ -6,6 +6,7 @@ import {
   FaTelegram,
   FaGlobe,
 } from "react-icons/fa";
+import { YOUTUBE_SUBSCRIBE_TITLE } from "@/lib/task-titles";
 
 type TaskCardProps = {
   title: string;
@@ -167,8 +168,8 @@ export default function TaskSelector(props: Props) {
 
         <div className="space-y-3">
           <TaskCard
-            title="Subscribe to Channel"
-            description="Require users to subscribe."
+            title={YOUTUBE_SUBSCRIBE_TITLE}
+            description="Require users to subscribe and turn on notifications."
             icon={<FaYoutube className="text-3xl text-red-500" />}
             active={ytSubscribe}
             onClick={() => toggleTask(ytSubscribe, setYtSubscribe, setYtSubscribeUrl)}

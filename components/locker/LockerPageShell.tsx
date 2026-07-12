@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import LockerGradientBackground from "@/components/locker/LockerGradientBackground";
+import LockerBannerAd from "@/components/locker/LockerBannerAd";
 import type { LockerBackgroundTheme } from "@/lib/locker-backgrounds";
 
 type LockerPageShellProps = {
@@ -31,9 +32,9 @@ export default function LockerPageShell({
           initial={reducedMotion ? false : { opacity: 0, y: 24, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full max-w-lg"
+          className="flex w-full max-w-[728px] flex-col items-center"
         >
-          <div className="group relative">
+          <div className="group relative w-full max-w-lg">
             <div className="absolute -inset-px rounded-3xl bg-gradient-to-b from-white/[0.08] to-transparent" />
 
             <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0B0B0F]/75 shadow-xl shadow-black/40 backdrop-blur-xl">
@@ -50,7 +51,11 @@ export default function LockerPageShell({
             </div>
           </div>
 
-          <p className="mt-6 text-center text-[11px] text-gray-600">UnlockScripts</p>
+          <LockerBannerAd />
+
+          <p className="mt-4 w-full max-w-lg text-center text-[11px] text-gray-600">
+            UnlockScripts
+          </p>
         </motion.div>
       </div>
     </main>

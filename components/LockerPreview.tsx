@@ -56,7 +56,15 @@ export default function LockerPreview({
       <p className="mb-6 text-sm text-gray-500">See how your locker will look</p>
 
       <div className="overflow-hidden rounded-xl border border-white/[0.06]">
-        <div className={`h-16 bg-gradient-to-br ${theme.preview} opacity-90`} />
+        <div
+          className="relative h-20 overflow-hidden"
+          style={{ backgroundColor: theme.base }}
+        >
+          <div className="absolute inset-0 scale-125" style={{ background: theme.mesh }} />
+          <div
+            className={`absolute inset-0 bg-gradient-to-br ${theme.preview} opacity-60 mix-blend-screen`}
+          />
+        </div>
 
         <div className="bg-white/[0.02] p-5 sm:p-6">
           <h1 className="text-xl font-bold sm:text-2xl">{title || "Your Locker Title"}</h1>

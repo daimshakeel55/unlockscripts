@@ -17,7 +17,7 @@ export default function BackgroundThemePicker({ value, onChange }: Props) {
         Locker Background
       </label>
       <p className="mb-4 text-xs text-gray-500">
-        Choose the animated gradient visitors see on your locker page.
+        Pick a vibrant animated gradient for your public locker page.
       </p>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {LOCKER_BACKGROUNDS.map((theme) => {
@@ -35,8 +35,17 @@ export default function BackgroundThemePicker({ value, onChange }: Props) {
               }`}
             >
               <div
-                className={`mb-3 h-14 rounded-lg bg-gradient-to-br ${theme.preview} opacity-80 transition-opacity group-hover:opacity-100`}
-              />
+                className="relative mb-3 h-16 overflow-hidden rounded-lg"
+                style={{ backgroundColor: theme.base }}
+              >
+                <div
+                  className="absolute inset-0 scale-150"
+                  style={{ background: theme.mesh }}
+                />
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${theme.preview} opacity-70 mix-blend-screen`}
+                />
+              </div>
               <span className="block text-sm font-medium text-white">{theme.name}</span>
               {selected && (
                 <span className="mt-1 block text-[10px] font-medium uppercase tracking-wider text-violet-300">
