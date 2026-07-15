@@ -475,12 +475,26 @@ export default function AnalyticsPage() {
 
       if (analyticsError) throw analyticsError;
 
-      const views =
-        lockerData?.reduce((sum, locker) => sum + Number(locker.views || 0), 0) || 0;
+      const viewCounts = new Map<string, number>();
+      analyticsData?.forEach((event) => {
+        if (event.event_type !== "view") return;
+        viewCounts.set(
+          event.locker_id,
+          (viewCounts.get(event.locker_id) || 0) + 1
+        );
+      });
+
+      const lockersWithViews =
+        lockerData?.map((locker) => ({
+          ...locker,
+          views: viewCounts.get(locker.id) || 0,
+        })) || [];
+
+      const views = analyticsData?.filter((e) => e.event_type === "view").length || 0;
       const unlocks =
         analyticsData?.filter((e) => e.event_type === "unlock").length || 0;
 
-      setLockers(lockerData || []);
+      setLockers(lockersWithViews);
       setEvents(analyticsData || []);
       setTotalViews(views);
       setTotalLockers(lockerData?.length || 0);

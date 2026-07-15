@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   FaYoutube,
@@ -12,6 +12,13 @@ import {
   FaLockOpen,
 } from "react-icons/fa";
 import { getTaskDisplayTitle } from "@/lib/task-titles";
+import {
+  getLockerSessionId,
+  hasTrackedUnlock,
+  hasTrackedView,
+  markUnlockTracked,
+  markViewTracked,
+} from "@/lib/locker-analytics";
 
 type Task = {
   id: string;
@@ -35,9 +42,13 @@ export default function LockerTasks({
 }: Props) {
   const [completed, setCompleted] = useState<string[]>([]);
   const [running, setRunning] = useState<string[]>([]);
+  const [hasUnlocked, setHasUnlocked] = useState(false);
   const reducedMotion = useReducedMotion() ?? false;
 
-  const trackEvent = async (eventType: string) => {
+  const trackEvent = useCallback(async (eventType: "view" | "unlock") => {
+    if (eventType === "view" && hasTrackedView(lockerId)) return;
+    if (eventType === "unlock" && hasTrackedUnlock(lockerId)) return;
+
     try {
       let country = "Unknown";
 
@@ -50,7 +61,7 @@ export default function LockerTasks({
         }
       } catch {}
 
-      await fetch("/api/analytics", {
+      const response = await fetch("/api/analytics", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -62,17 +73,23 @@ export default function LockerTasks({
           browser: navigator.userAgent,
           device: /Mobi/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
           country,
-          ipAddress: "",
+          sessionId: getLockerSessionId(lockerId),
         }),
       });
+
+      if (!response.ok) return;
+
+      if (eventType === "view") markViewTracked(lockerId);
+      if (eventType === "unlock") markUnlockTracked(lockerId);
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [lockerId, ownerId]);
 
   useEffect(() => {
-    trackEvent("view");
-  }, []);
+    setHasUnlocked(hasTrackedUnlock(lockerId));
+    void trackEvent("view");
+  }, [lockerId, trackEvent]);
 
   function completeTask(task: Task) {
     if (completed.includes(task.id) || running.includes(task.id)) {
@@ -249,7 +266,10 @@ export default function LockerTasks({
           <motion.button
             type="button"
             onClick={async () => {
-              await trackEvent("unlock");
+              if (!hasUnlocked) {
+                await trackEvent("unlock");
+                setHasUnlocked(true);
+              }
               window.open(destinationUrl, "_blank");
             }}
             initial={reducedMotion ? false : { scale: 0.98 }}
@@ -259,7 +279,7 @@ export default function LockerTasks({
             className="mt-6 flex w-full items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 py-4 text-base font-bold text-white shadow-xl shadow-green-900/40 transition-all hover:brightness-110"
           >
             <FaLockOpen className="text-lg" aria-hidden="true" />
-            Unlock Content Now
+            {hasUnlocked ? "Open Content" : "Unlock Content Now"}
           </motion.button>
         ) : (
           <button

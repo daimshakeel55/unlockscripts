@@ -223,6 +223,7 @@ function LockerCard({
 export default function DashboardPage() {
   const { success, error } = useToast();
   const [lockers, setLockers] = useState<Locker[]>([]);
+  const [totalViews, setTotalViews] = useState(0);
   const [loading, setLoading] = useState(true);
   const reducedMotion = useReducedMotion() ?? false;
 
@@ -246,9 +247,18 @@ export default function DashboardPage() {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
+    const { data: analyticsData } = await supabase
+      .from("analytics_events")
+      .select("event_type")
+      .eq("owner_id", user.id);
+
     if (!loadError && data) {
       setLockers(data);
     }
+
+    setTotalViews(
+      analyticsData?.filter((event) => event.event_type === "view").length || 0
+    );
 
     setLoading(false);
   }
@@ -284,15 +294,13 @@ export default function DashboardPage() {
     const createdThisWeek = lockers.filter(
       (l) => new Date(l.created_at).getTime() >= weekAgo
     ).length;
-    const totalViews = lockers.reduce((sum, l) => sum + (l.views ?? 0), 0);
-
     return {
       total: lockers.length,
       active: lockers.length,
       createdThisWeek,
       totalViews,
     };
-  }, [lockers]);
+  }, [lockers, totalViews]);
 
   const chartData = useMemo(() => {
     const days = Array.from({ length: 7 }, (_, i) => {
