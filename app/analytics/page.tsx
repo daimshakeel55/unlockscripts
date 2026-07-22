@@ -24,6 +24,7 @@ type Locker = {
 
 type AnalyticsEvent = {
   id: string;
+  locker_id: string;
   country: string | null;
   browser: string | null;
   device: string | null;
@@ -461,19 +462,15 @@ export default function AnalyticsPage() {
         return;
       }
 
-      const { data: lockerData, error: lockerError } = await supabase
-        .from("lockers")
-        .select("id, title, views")
-        .eq("user_id", user.id);
+      const response = await fetch("/api/analytics/summary");
+      const payload = await response.json();
 
-      if (lockerError) throw lockerError;
+      if (!response.ok) {
+        throw new Error(payload.error || "Failed to load analytics");
+      }
 
-      const { data: analyticsData, error: analyticsError } = await supabase
-        .from("analytics_events")
-        .select("*")
-        .eq("owner_id", user.id);
-
-      if (analyticsError) throw analyticsError;
+      const lockerData = payload.lockers as Locker[];
+      const analyticsData = payload.events as AnalyticsEvent[];
 
       const viewCounts = new Map<string, number>();
       analyticsData?.forEach((event) => {
@@ -536,7 +533,9 @@ export default function AnalyticsPage() {
 
   const topCountries = useMemo(() => {
     const map: Record<string, number> = {};
-    events.forEach((e) => {
+    events
+      .filter((e) => e.event_type === "view")
+      .forEach((e) => {
       const country = e.country || "Unknown";
       map[country] = (map[country] || 0) + 1;
     });
@@ -552,7 +551,10 @@ export default function AnalyticsPage() {
   );
 
   const browserItems = useMemo(() => {
-    return countByKey(events, (e) => parseBrowser(e.browser)).map((item) => ({
+    return countByKey(
+      events.filter((e) => e.event_type === "view"),
+      (e) => parseBrowser(e.browser)
+    ).map((item) => ({
       ...item,
       icon: browserIcon(item.label),
       color: "bg-gradient-to-r from-violet-600 to-indigo-500",
@@ -560,7 +562,10 @@ export default function AnalyticsPage() {
   }, [events]);
 
   const deviceItems = useMemo(() => {
-    return countByKey(events, (e) => e.device || "Unknown").map((item) => ({
+    return countByKey(
+      events.filter((e) => e.event_type === "view"),
+      (e) => e.device || "Unknown"
+    ).map((item) => ({
       ...item,
       icon:
         item.label === "Mobile" ? (

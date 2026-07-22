@@ -247,17 +247,16 @@ export default function DashboardPage() {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
-    const { data: analyticsData } = await supabase
-      .from("analytics_events")
-      .select("event_type")
-      .eq("owner_id", user.id);
+    const summaryRes = await fetch("/api/analytics/summary");
+    const summary = summaryRes.ok ? await summaryRes.json() : { events: [] };
+    const analyticsEvents = (summary.events ?? []) as { event_type: string }[];
 
     if (!loadError && data) {
       setLockers(data);
     }
 
     setTotalViews(
-      analyticsData?.filter((event) => event.event_type === "view").length || 0
+      analyticsEvents.filter((event) => event.event_type === "view").length
     );
 
     setLoading(false);

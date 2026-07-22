@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   FaYoutube,
@@ -34,6 +34,8 @@ type Props = {
   ownerId: string;
 };
 
+const TASK_WAIT_MS = 12_000;
+
 export default function LockerTasks({
   tasks,
   destinationUrl,
@@ -41,75 +43,106 @@ export default function LockerTasks({
   ownerId,
 }: Props) {
   const [completed, setCompleted] = useState<string[]>([]);
-  const [running, setRunning] = useState<string[]>([]);
+  const [runningId, setRunningId] = useState<string | null>(null);
+  const [waitSeconds, setWaitSeconds] = useState(0);
   const [hasUnlocked, setHasUnlocked] = useState(false);
+  const [unlockPending, setUnlockPending] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const reducedMotion = useReducedMotion() ?? false;
 
-  const trackEvent = useCallback(async (eventType: "view" | "unlock") => {
-    if (eventType === "view" && hasTrackedView(lockerId)) return;
-    if (eventType === "unlock" && hasTrackedUnlock(lockerId)) return;
-
-    try {
-      let country = "Unknown";
-
-      try {
-        const response = await fetch("https://ipwho.is/");
-        const data = await response.json();
-
-        if (data.success) {
-          country = data.country;
-        }
-      } catch {}
-
-      const response = await fetch("/api/analytics", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          lockerId,
-          ownerId,
-          eventType,
-          browser: navigator.userAgent,
-          device: /Mobi/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
-          country,
-          sessionId: getLockerSessionId(lockerId),
-        }),
-      });
-
-      if (!response.ok) return;
+  const trackEvent = useCallback(
+    async (eventType: "view" | "unlock") => {
+      if (eventType === "view" && hasTrackedView(lockerId)) return;
+      if (eventType === "unlock" && hasTrackedUnlock(lockerId)) return;
 
       if (eventType === "view") markViewTracked(lockerId);
-      if (eventType === "unlock") markUnlockTracked(lockerId);
-    } catch (err) {
-      console.error(err);
-    }
-  }, [lockerId, ownerId]);
+
+      try {
+        let country = "Unknown";
+        try {
+          const response = await fetch("https://ipwho.is/");
+          const data = await response.json();
+          if (data.success) country = data.country;
+        } catch {}
+
+        const response = await fetch("/api/analytics", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            lockerId,
+            ownerId,
+            eventType,
+            browser: navigator.userAgent,
+            device: /Mobi/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
+            country,
+            sessionId: getLockerSessionId(lockerId),
+          }),
+        });
+
+        if (!response.ok) return;
+
+        if (eventType === "unlock") markUnlockTracked(lockerId);
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [lockerId, ownerId]
+  );
 
   useEffect(() => {
     setHasUnlocked(hasTrackedUnlock(lockerId));
     void trackEvent("view");
   }, [lockerId, trackEvent]);
 
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (tickRef.current) clearInterval(tickRef.current);
+    };
+  }, []);
+
   function completeTask(task: Task) {
-    if (completed.includes(task.id) || running.includes(task.id)) {
-      return;
+    if (completed.includes(task.id) || runningId !== null) return;
+
+    if (task.url) {
+      window.open(task.url, "_blank", "noopener,noreferrer");
     }
 
-    window.open(task.url, "_blank");
+    setRunningId(task.id);
+    setWaitSeconds(Math.ceil(TASK_WAIT_MS / 1000));
 
-    setRunning((prev) => [...prev, task.id]);
+    if (tickRef.current) clearInterval(tickRef.current);
+    tickRef.current = setInterval(() => {
+      setWaitSeconds((s) => Math.max(0, s - 1));
+    }, 1000);
 
-    setTimeout(() => {
-      setCompleted((prev) => [...prev, task.id]);
-      setRunning((prev) => prev.filter((id) => id !== task.id));
-    }, 10000);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      if (tickRef.current) clearInterval(tickRef.current);
+      setCompleted((prev) => (prev.includes(task.id) ? prev : [...prev, task.id]));
+      setRunningId(null);
+      setWaitSeconds(0);
+    }, TASK_WAIT_MS);
   }
 
   const allCompleted = tasks.length > 0 && completed.length === tasks.length;
-
   const percentage =
     tasks.length === 0 ? 0 : Math.round((completed.length / tasks.length) * 100);
+
+  async function handleUnlock() {
+    if (unlockPending || !allCompleted) return;
+    setUnlockPending(true);
+    try {
+      if (!hasUnlocked) {
+        await trackEvent("unlock");
+        setHasUnlocked(true);
+      }
+      window.open(destinationUrl, "_blank", "noopener,noreferrer");
+    } finally {
+      setUnlockPending(false);
+    }
+  }
 
   function getTaskStyle(type: string) {
     if (type.startsWith("youtube")) {
@@ -167,14 +200,16 @@ export default function LockerTasks({
   return (
     <div className="w-full">
       <p className="mb-5 text-sm text-gray-500">
-        Complete {tasks.length} {tasks.length === 1 ? "task" : "tasks"} to unlock
+        Complete {tasks.length} {tasks.length === 1 ? "task" : "tasks"} to unlock — one at a
+        time
       </p>
 
       <div className="space-y-3">
         {tasks.map((task, index) => {
           const style = getTaskStyle(task.type);
           const isCompleted = completed.includes(task.id);
-          const isRunning = running.includes(task.id);
+          const isRunning = runningId === task.id;
+          const disabled = isCompleted || isRunning || (runningId !== null && !isRunning);
 
           return (
             <motion.div
@@ -190,10 +225,6 @@ export default function LockerTasks({
                     : "border-white/[0.08] bg-white/[0.03] hover:border-violet-500/40 hover:bg-white/[0.05]"
               }`}
             >
-              {!isCompleted && !isRunning && (
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-violet-600/0 via-violet-600/5 to-fuchsia-600/0 opacity-0 transition-opacity group-hover:opacity-100" />
-              )}
-
               <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-4">
                   <div
@@ -201,7 +232,6 @@ export default function LockerTasks({
                   >
                     {style.icon}
                   </div>
-
                   <div className="min-w-0">
                     <h3 className="font-semibold text-white">
                       {getTaskDisplayTitle(task.type, task.title)}
@@ -215,14 +245,14 @@ export default function LockerTasks({
                 <button
                   type="button"
                   onClick={() => completeTask(task)}
-                  disabled={isCompleted || isRunning}
+                  disabled={disabled}
                   className={`relative shrink-0 overflow-hidden rounded-xl px-6 py-3 text-sm font-bold transition-all ${
                     isCompleted
                       ? "bg-green-600 text-white shadow-lg shadow-green-900/30"
                       : isRunning
                         ? "bg-amber-500 text-black shadow-lg shadow-amber-900/30"
-                        : "bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-lg shadow-violet-900/40 hover:brightness-110 hover:shadow-violet-900/60"
-                  } disabled:cursor-not-allowed`}
+                        : "bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-lg shadow-violet-900/40 hover:brightness-110"
+                  } disabled:cursor-not-allowed disabled:opacity-60`}
                 >
                   {isCompleted ? (
                     <span className="flex items-center justify-center gap-2">
@@ -232,7 +262,7 @@ export default function LockerTasks({
                   ) : isRunning ? (
                     <span className="flex items-center justify-center gap-2">
                       <FaClock className="animate-pulse" aria-hidden="true" />
-                      Waiting...
+                      {waitSeconds > 0 ? `${waitSeconds}s…` : "Waiting…"}
                     </span>
                   ) : (
                     "Complete Task"
@@ -259,24 +289,14 @@ export default function LockerTasks({
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-violet-600 via-fuchsia-500 to-violet-400"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent" />
         </div>
 
         {allCompleted ? (
           <motion.button
             type="button"
-            onClick={async () => {
-              if (!hasUnlocked) {
-                await trackEvent("unlock");
-                setHasUnlocked(true);
-              }
-              window.open(destinationUrl, "_blank");
-            }}
-            initial={reducedMotion ? false : { scale: 0.98 }}
-            animate={{ scale: 1 }}
-            whileHover={reducedMotion ? undefined : { scale: 1.02 }}
-            whileTap={reducedMotion ? undefined : { scale: 0.98 }}
-            className="mt-6 flex w-full items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 py-4 text-base font-bold text-white shadow-xl shadow-green-900/40 transition-all hover:brightness-110"
+            onClick={() => void handleUnlock()}
+            disabled={unlockPending}
+            className="mt-6 flex w-full items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 py-4 text-base font-bold text-white shadow-xl shadow-green-900/40 hover:brightness-110 disabled:opacity-70"
           >
             <FaLockOpen className="text-lg" aria-hidden="true" />
             {hasUnlocked ? "Open Content" : "Unlock Content Now"}

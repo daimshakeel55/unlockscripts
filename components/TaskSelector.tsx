@@ -7,6 +7,25 @@ import {
   FaGlobe,
 } from "react-icons/fa";
 import { YOUTUBE_SUBSCRIBE_TITLE } from "@/lib/task-titles";
+import { type TaskType } from "@/lib/task-catalog";
+
+function toggleTask(
+  type: TaskType,
+  active: boolean,
+  setActive: (v: boolean) => void,
+  setUrl: (v: string) => void,
+  taskOrder: TaskType[],
+  onTaskOrderChange: (order: TaskType[]) => void
+) {
+  if (active) {
+    setUrl("");
+    setActive(false);
+    onTaskOrderChange(taskOrder.filter((t) => t !== type));
+  } else {
+    setActive(true);
+    onTaskOrderChange(taskOrder.includes(type) ? taskOrder : [...taskOrder, type]);
+  }
+}
 
 type TaskCardProps = {
   title: string;
@@ -115,12 +134,10 @@ type Props = {
   setWebsite: (v: boolean) => void;
   websiteUrl: string;
   setWebsiteUrl: (v: string) => void;
-};
 
-function toggleTask(active: boolean, setActive: (v: boolean) => void, setUrl: (v: string) => void) {
-  if (active) setUrl("");
-  setActive(!active);
-}
+  taskOrder: TaskType[];
+  onTaskOrderChange: (order: TaskType[]) => void;
+};
 
 export default function TaskSelector(props: Props) {
   const {
@@ -152,6 +169,8 @@ export default function TaskSelector(props: Props) {
     setWebsite,
     websiteUrl,
     setWebsiteUrl,
+    taskOrder,
+    onTaskOrderChange,
   } = props;
 
   return (
@@ -172,7 +191,16 @@ export default function TaskSelector(props: Props) {
             description="Require users to subscribe and turn on notifications."
             icon={<FaYoutube className="text-3xl text-red-500" />}
             active={ytSubscribe}
-            onClick={() => toggleTask(ytSubscribe, setYtSubscribe, setYtSubscribeUrl)}
+            onClick={() =>
+              toggleTask(
+                "youtube_subscribe",
+                ytSubscribe,
+                setYtSubscribe,
+                setYtSubscribeUrl,
+                taskOrder,
+                onTaskOrderChange
+              )
+            }
             url={ytSubscribeUrl}
             onUrlChange={setYtSubscribeUrl}
             urlLabel="YouTube channel link"
@@ -183,7 +211,9 @@ export default function TaskSelector(props: Props) {
             description="Require users to like a video."
             icon={<FaYoutube className="text-3xl text-red-500" />}
             active={ytLike}
-            onClick={() => toggleTask(ytLike, setYtLike, setYtLikeUrl)}
+            onClick={() =>
+              toggleTask("youtube_like", ytLike, setYtLike, setYtLikeUrl, taskOrder, onTaskOrderChange)
+            }
             url={ytLikeUrl}
             onUrlChange={setYtLikeUrl}
             urlLabel="YouTube video link"
@@ -194,7 +224,16 @@ export default function TaskSelector(props: Props) {
             description="Require users to comment."
             icon={<FaYoutube className="text-3xl text-red-500" />}
             active={ytComment}
-            onClick={() => toggleTask(ytComment, setYtComment, setYtCommentUrl)}
+            onClick={() =>
+              toggleTask(
+                "youtube_comment",
+                ytComment,
+                setYtComment,
+                setYtCommentUrl,
+                taskOrder,
+                onTaskOrderChange
+              )
+            }
             url={ytCommentUrl}
             onUrlChange={setYtCommentUrl}
             urlLabel="YouTube video link"
@@ -205,7 +244,9 @@ export default function TaskSelector(props: Props) {
             description="Require users to watch the video."
             icon={<FaYoutube className="text-3xl text-red-500" />}
             active={ytWatch}
-            onClick={() => toggleTask(ytWatch, setYtWatch, setYtWatchUrl)}
+            onClick={() =>
+              toggleTask("youtube_watch", ytWatch, setYtWatch, setYtWatchUrl, taskOrder, onTaskOrderChange)
+            }
             url={ytWatchUrl}
             onUrlChange={setYtWatchUrl}
             urlLabel="YouTube video link"
@@ -224,7 +265,9 @@ export default function TaskSelector(props: Props) {
           description="Require users to join your server."
           icon={<FaDiscord className="text-3xl text-indigo-400" />}
           active={discord}
-          onClick={() => toggleTask(discord, setDiscord, setDiscordUrl)}
+          onClick={() =>
+            toggleTask("discord", discord, setDiscord, setDiscordUrl, taskOrder, onTaskOrderChange)
+          }
           url={discordUrl}
           onUrlChange={setDiscordUrl}
           urlLabel="Discord invite link"
@@ -242,7 +285,9 @@ export default function TaskSelector(props: Props) {
           description="Require users to join your Telegram."
           icon={<FaTelegram className="text-3xl text-sky-400" />}
           active={telegram}
-          onClick={() => toggleTask(telegram, setTelegram, setTelegramUrl)}
+          onClick={() =>
+            toggleTask("telegram", telegram, setTelegram, setTelegramUrl, taskOrder, onTaskOrderChange)
+          }
           url={telegramUrl}
           onUrlChange={setTelegramUrl}
           urlLabel="Telegram channel link"
@@ -260,7 +305,9 @@ export default function TaskSelector(props: Props) {
           description="Require users to visit your website."
           icon={<FaGlobe className="text-3xl text-green-400" />}
           active={website}
-          onClick={() => toggleTask(website, setWebsite, setWebsiteUrl)}
+          onClick={() =>
+            toggleTask("website", website, setWebsite, setWebsiteUrl, taskOrder, onTaskOrderChange)
+          }
           url={websiteUrl}
           onUrlChange={setWebsiteUrl}
           urlLabel="Website URL"

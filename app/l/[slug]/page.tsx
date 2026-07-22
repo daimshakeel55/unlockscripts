@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
-import LockerTasks from "@/components/LockerTasks";
-import LockerPageShell from "@/components/locker/LockerPageShell";
+import { sortTasksByOrder } from "@/lib/task-catalog";
+import LockerTasks from "@/components/LockerTasks";import LockerPageShell from "@/components/locker/LockerPageShell";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -34,11 +34,12 @@ export default async function LockerPage({ params }: Props) {
     );
   }
 
-  const { data: tasks } = await supabase
+  const { data: tasksRaw } = await supabase
     .from("tasks")
     .select("*")
     .eq("locker_id", locker.id);
 
+  const tasks = sortTasksByOrder(tasksRaw ?? []);
   return (
     <LockerPageShell
       title={locker.title}

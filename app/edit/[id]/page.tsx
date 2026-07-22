@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { sortTasksByOrder } from "@/lib/task-catalog";
 import EditLockerView from "@/components/EditLockerView";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +27,12 @@ export default async function EditLockerPage({ params }: Props) {
     );
   }
 
-  const { data: tasks } = await supabase.from("tasks").select("*").eq("locker_id", id);
+  const { data: tasksRaw } = await supabase
+    .from("tasks")
+    .select("*")
+    .eq("locker_id", id);
+
+  const tasks = sortTasksByOrder(tasksRaw ?? []);
 
   return (
     <EditLockerView

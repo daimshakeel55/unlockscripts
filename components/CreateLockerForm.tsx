@@ -8,24 +8,23 @@ import { getAbsoluteUrl } from "@/lib/site-url";
 import { copyToClipboard } from "@/lib/copy-to-clipboard";
 import { useToast } from "@/components/ui/Toast";
 import TaskSelector from "./TaskSelector";
+import TaskOrderEditor from "./TaskOrderEditor";
 import LockerPreview from "./LockerPreview";
 import BackgroundThemePicker from "./locker/BackgroundThemePicker";
 import {
   DEFAULT_LOCKER_BACKGROUND,
   type LockerBackgroundTheme,
 } from "@/lib/locker-backgrounds";
-import { YOUTUBE_SUBSCRIBE_TITLE } from "@/lib/task-titles";
+import {
+  buildTasksForInsert,
+  TASK_CATALOG,
+  type TaskType,
+} from "@/lib/task-catalog";
 
 const inputClassName =
   "w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-3.5 text-white backdrop-blur-sm outline-none transition-colors placeholder:text-gray-500 focus:border-violet-500/50 focus:bg-white/[0.05]";
 
 const labelClassName = "mb-2 block text-sm font-medium text-gray-300";
-
-interface Task {
-  type: string;
-  title: string;
-  url: string;
-}
 
 interface PreviewTask {
   title: string;
@@ -62,8 +61,19 @@ export default function CreateLockerForm() {
   const [websiteUrl, setWebsiteUrl] = useState<string>("");
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [taskOrder, setTaskOrder] = useState<TaskType[]>([]);
 
   const reducedMotion = useReducedMotion() ?? false;
+
+  const taskUrls: Partial<Record<TaskType, string>> = {
+    youtube_subscribe: ytSubscribeUrl,
+    youtube_like: ytLikeUrl,
+    youtube_comment: ytCommentUrl,
+    youtube_watch: ytWatchUrl,
+    discord: discordUrl,
+    telegram: telegramUrl,
+    website: websiteUrl,
+  };
 
   async function saveLocker(e: React.FormEvent) {
     e.preventDefault();
@@ -86,23 +96,6 @@ export default function CreateLockerForm() {
       return;
     }
 
-    const activeTasks: Task[] = [];
-
-    if (ytSubscribe)
-      activeTasks.push({ type: "youtube_subscribe", title: YOUTUBE_SUBSCRIBE_TITLE, url: ytSubscribeUrl });
-    if (ytLike)
-      activeTasks.push({ type: "youtube_like", title: "Like Video", url: ytLikeUrl });
-    if (ytComment)
-      activeTasks.push({ type: "youtube_comment", title: "Comment on Video", url: ytCommentUrl });
-    if (ytWatch)
-      activeTasks.push({ type: "youtube_watch", title: "Watch Video", url: ytWatchUrl });
-    if (discord)
-      activeTasks.push({ type: "discord", title: "Join Discord", url: discordUrl });
-    if (telegram)
-      activeTasks.push({ type: "telegram", title: "Join Telegram", url: telegramUrl });
-    if (website)
-      activeTasks.push({ type: "website", title: "Visit Website", url: websiteUrl });
-
     try {
       const { data: locker, error: lockerError } = await supabase
         .from("lockers")
@@ -118,15 +111,9 @@ export default function CreateLockerForm() {
 
       if (lockerError) throw lockerError;
 
-      if (activeTasks.length > 0) {
-        const { error: taskError } = await supabase
-          .from("tasks")
-          .insert(
-            activeTasks.map((task) => ({
-              ...task,
-              locker_id: locker.id,
-            }))
-          );
+      if (taskOrder.length > 0) {
+        const rows = buildTasksForInsert(taskOrder, taskUrls, locker.id);
+        const { error: taskError } = await supabase.from("tasks").insert(rows);
 
         if (taskError) throw taskError;
       }
@@ -152,15 +139,11 @@ export default function CreateLockerForm() {
     }
   }
 
-  const previewTasks: PreviewTask[] = [
-    { title: YOUTUBE_SUBSCRIBE_TITLE, active: ytSubscribe, type: "youtube_subscribe" },
-    { title: "Like Video", active: ytLike, type: "youtube_like" },
-    { title: "Comment on Video", active: ytComment, type: "youtube_comment" },
-    { title: "Watch Video", active: ytWatch, type: "youtube_watch" },
-    { title: "Join Discord", active: discord, type: "discord" },
-    { title: "Join Telegram", active: telegram, type: "telegram" },
-    { title: "Visit Website", active: website, type: "website" },
-  ];
+  const previewTasks: PreviewTask[] = taskOrder.map((type) => ({
+    title: TASK_CATALOG[type].title,
+    active: true,
+    type,
+  }));
 
   return (
     <form onSubmit={saveLocker} className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
@@ -247,8 +230,12 @@ export default function CreateLockerForm() {
           setWebsite={setWebsite}
           websiteUrl={websiteUrl}
           setWebsiteUrl={setWebsiteUrl}
+          taskOrder={taskOrder}
+          onTaskOrderChange={setTaskOrder}
           />
         </motion.div>
+
+        <TaskOrderEditor taskOrder={taskOrder} onChange={setTaskOrder} />
 
         <motion.button
           type="submit"
